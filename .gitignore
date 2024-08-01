@@ -18,3 +18,5 @@ buildNumber.properties
 
 .mvn
 .settings
+
+src/main/resources/certs
