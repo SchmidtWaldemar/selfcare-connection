@@ -1,0 +1,53 @@
+version: '3.8'
+## docker compose configuration data for production mode
+services:
+  webserver: # nginx webserver to call service from outside
+    image: nginx:alpine # light version of nginx
+    container_name: webserver
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf # copy config file of nginx to container
+      - /etc/letsencrypt/:/etc/letsencrypt/ # productive server reached by public domain and registered by letsencryt
+    restart: unless-stopped # start again by crash or something else
+    ports:
+      - "443:443" # use encrypted https port to comunicate with website
+    depends_on:
+      - app # make sure that the docker-service 'app' is started too
+    networks:
+      - reverse-proxy-network # network for proxy for redirect to intern spring boot service
+
+  mongodb:
+    image: mongo:latest # use the last version of mongoDB
+    ports:
+      - "27017:27017" # port forwarding to standrad mongoDB port 
+    networks:
+      - internalnetwork # use only intern network for communication and never outside the server
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    image: selfcare-connection-app # app service image name 
+    build:
+      context: .
+      dockerfile: Dockerfile # name of configuration Dockerfile 
+    ports:
+      - "8443:8443" # use only secure port with ssl protocol
+    environment: # database data information and credentials you find in spring boot application properties
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: testdb
+    depends_on:
+      - mongodb # docker service should only be started with database 
+    container_name: selfcare-connection-server # container name of docker
+    networks: # used networks for all containers 
+      - reverse-proxy-network
+      - internalnetwork
+
+networks: # type of container networks
+  internalnetwork: # used for internal container communication in bdidge mode
+    driver: bridge
+  reverse-proxy-network: # needed for external server communication by reverse proxy
+    external:
+      name: proxy-network
+
+volumes:
+  mongo_data:

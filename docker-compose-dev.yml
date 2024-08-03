@@ -1,0 +1,50 @@
+version: '3.8'
+## docker compose file for development area
+## see more comments by production config file in docker-compose.yml  
+services:
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    volumes:
+      - ./nginx_dev.conf:/etc/nginx/nginx.conf
+      - ./certs:/etc/nginx/certs
+    restart: unless-stopped
+    ports:
+      - "443:443"
+    depends_on:
+      - app
+    networks:
+      - internalnetwork
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - internalnetwork
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    image: selfcare-connection-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8443:8443"
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: testdb
+    depends_on:
+      - mongodb
+    container_name: selfcare-connection-server
+    networks:
+      - internalnetwork
+
+networks:
+  internalnetwork:
+    driver: bridge
+
+volumes:
+  mongo_data:

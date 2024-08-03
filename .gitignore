@@ -19,4 +19,7 @@ buildNumber.properties
 .mvn
 .settings
 
+.vscode/
+
+certs/
 src/main/resources/certs
