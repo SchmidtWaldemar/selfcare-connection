@@ -1,5 +1,8 @@
 # Änderungsübersicht
 
+## Update 06-08-2024
+Datenbank Persistenz und Benutzer mit Rollen
+
 ## Update 03-08-2024
 Test- und Liveumgebung mit Docker-Compose starten
 

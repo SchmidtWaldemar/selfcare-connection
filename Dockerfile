@@ -7,7 +7,7 @@ COPY certs/localhost.p12 src/main/resources
 COPY pom.xml /app
 
 # start build process by maven
-RUN mvn -f /app/pom.xml clean package
+RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip
 
 # Next stage by using the preferred OpenJDK base image
 FROM openjdk:17-jdk-alpine

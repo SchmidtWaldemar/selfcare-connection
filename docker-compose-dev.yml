@@ -16,35 +16,53 @@ services:
     networks:
       - internalnetwork
 
-  mongodb:
-    image: mongo:latest
+  maria_db:
+    image: mariadb:11.4.2
+    env_file: ./.env
+    environment:
+      - MYSQL_DATABASE=$DEV_MYSQLDB_DATABASE
+      - MYSQL_USER=$DEV_MYSQLDB_USER
+      - MYSQL_PASSWORD=$DEV_MYSQLDB_PASSWORD
+    volumes:
+      - data:/var/lib/mysql
+      - ./init-dev.sql:/data/application/init-dev.sql
+    command: --init-file /data/application/init-dev.sql
     ports:
-      - "27017:27017"
+      - $DEV_MYSQLDB_LOCAL_PORT:$DEV_MYSQLDB_DOCKER_PORT
     networks:
       - internalnetwork
-    volumes:
-      - mongo_data:/data/db
+    restart: unless-stopped
 
   app:
     image: selfcare-connection-app
     build:
       context: .
       dockerfile: Dockerfile
+    env_file: ./.env
     ports:
       - "8443:8443"
     environment:
-      SPRING_DATA_MONGODB_HOST: mongodb
-      SPRING_DATA_MONGODB_PORT: 27017
-      SPRING_DATA_MONGODB_DATABASE: testdb
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:mysql://maria_db:$DEV_MYSQLDB_DOCKER_PORT/$DEV_MYSQLDB_DATABASE",
+        "spring.datasource.username" : "$DEV_MYSQLDB_USER",
+        "spring.datasource.password" : "$DEV_MYSQLDB_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
+        "spring.jpa.properties.hibernate.dialect.storage_engine" : "innodb",
+        "spring.jpa.hibernate.ddl-auto" : "create"
+       }'
     depends_on:
-      - mongodb
+      - maria_db
     container_name: selfcare-connection-server
     networks:
       - internalnetwork
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
 
 networks:
   internalnetwork:
     driver: bridge
 
 volumes:
-  mongo_data:
+  data:
