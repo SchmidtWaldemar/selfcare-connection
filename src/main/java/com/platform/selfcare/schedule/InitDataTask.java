@@ -64,6 +64,8 @@ public class InitDataTask {
 				roles.add(uRole.get());
 				roles.add(aRole.get());
 				adminUser.setRoles(roles);
+				// TODO: set to false by using 2F authentication mode
+				adminUser.setEnabled(true);
 				this.userRepository.save(adminUser);
 			}
 			else {

@@ -1,5 +1,8 @@
 # Änderungsübersicht
 
+## Update 07-08-2024
+An- und Abmeldung innerhalb der Plattform
+
 ## Update 06-08-2024
 Datenbank Persistenz und Benutzer mit Rollen
 

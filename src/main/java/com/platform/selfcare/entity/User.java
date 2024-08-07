@@ -1,7 +1,13 @@
 package com.platform.selfcare.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.platform.selfcare.validation.ValidEmail;
 
@@ -40,6 +46,9 @@ public class User {
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+	
+	@Column(name = "enabled", nullable = false, columnDefinition = "boolean default false")
+	private boolean enabled;
 
 	User() {}
 
@@ -94,5 +103,28 @@ public class User {
 
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
+	}
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	/**
+	 * fetched all authorities by role of user
+	 * 
+	 * @return list of collection
+	 */
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		Set<Role> roles = getRoles();
+		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+		
+		for (Role role : roles) {
+			authorities.add(new SimpleGrantedAuthority(role.getName()));
+		}
+		return authorities;
 	}
 }

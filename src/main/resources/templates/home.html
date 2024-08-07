@@ -7,9 +7,14 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
 </head>
 <body>
-    <h1 th:text="|Hallo, ${name}!|"></h1>
-    <div>
+    <h1 th:if="${me}" th:text="|Hallo, ${me.user.firstName} ${me.user.lastName}!|"></h1>
+    <h1 th:unless="${me}" th:text="|Hallo, ${name}!|"></h1>
+    <div class="container">
         Herzlich Willkommen bei der Selbsthilfe Plattform. 
     </div>
+    <footer>
+        <a th:if="${me}" href="/logout" rel="Logout">Abmelden</a>
+        <a th:unless="${me}" href="/login" rel="Logout">Anmelden</a>
+    </footer>
 </body>
 </html>
