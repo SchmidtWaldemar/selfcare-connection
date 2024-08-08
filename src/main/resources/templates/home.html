@@ -4,17 +4,36 @@
     <title>Selbsthilfe Plattform</title> 
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
 </head>
 <body>
     <h1 th:if="${me}" th:text="|Hallo, ${me.user.firstName} ${me.user.lastName}!|"></h1>
     <h1 th:unless="${me}" th:text="|Hallo, ${name}!|"></h1>
-    <div class="container">
+    <div class="mb-5">
         Herzlich Willkommen bei der Selbsthilfe Plattform. 
     </div>
     <footer>
-        <a th:if="${me}" href="/logout" rel="Logout">Abmelden</a>
-        <a th:unless="${me}" href="/login" rel="Logout">Anmelden</a>
+        <div th:if="${me}">
+            <div class="mb-3">
+                Was möchtest du tun?
+            </div>
+
+            <div th:if="${me.user.hasRole('USER')}" class="mb-3">
+                <a href="/overview" rel="Overview">Zur Übersicht</a>
+            </div>
+            <div th:if="${me.isAdmin()}" class="mb-3">
+                <a href="/admin" rel="Admin">Zur Administration</a>
+            </div>
+            <form th:action="@{/logout}" method="POST">
+                <input class="link" type="submit" value="Abmelden" />
+            </form>
+        </div>
+        <div th:unless="${me}">
+            <a href="/login" rel="Logout">Anmelden</a>
+        </div>
     </footer>
 </body>
 </html>

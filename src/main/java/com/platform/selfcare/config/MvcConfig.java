@@ -4,6 +4,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.lang.NonNull;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
@@ -21,7 +22,7 @@ public class MvcConfig implements WebMvcConfigurer {
 	@Override
 	public void addResourceHandlers(@NonNull ResourceHandlerRegistry registry) {
     	 registry.addResourceHandler("/**")
-         	.addResourceLocations("classpath:/resources/", "classpath:/static/");
+    	 	.addResourceLocations("classpath:/resources/", "classpath:/static/");
 	}
 
 	/**
@@ -31,5 +32,13 @@ public class MvcConfig implements WebMvcConfigurer {
 		registry.addViewController("/").setViewName("forward:/home");
 		registry.addViewController("/home").setViewName("home");
 		registry.addViewController("/login").setViewName("login");
+		registry.addViewController("/logout").setViewName("logout");
+		registry.addViewController("/admin").setViewName("admin");
+		registry.addViewController("/overview").setViewName("overview");
+	}
+	
+	@Override
+	public void addCorsMappings(@NonNull CorsRegistry registry) {
+		registry.addMapping("/**").allowedMethods("GET", "POST");
 	}
 }

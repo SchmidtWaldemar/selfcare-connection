@@ -6,3 +6,11 @@ body {
 	justify-content: center;
 	flex-flow: column;
 }
+
+.link { 
+	background: none;
+	border: none;
+	color: navy;
+	cursor: pointer;
+	font-size: inherit;
+}

@@ -113,6 +113,16 @@ public class User {
 		this.enabled = enabled;
 	}
 
+	public boolean hasRole(String role) {
+		if (this.roles == null) {
+			return false;
+		}
+		else {
+			String roleCheck = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+			return this.roles.stream().anyMatch(r -> r.getName().equals(roleCheck));
+		}
+	}
+
 	/**
 	 * fetched all authorities by role of user
 	 * 

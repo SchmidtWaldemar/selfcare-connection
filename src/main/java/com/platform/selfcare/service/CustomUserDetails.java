@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.platform.selfcare.entity.User;
+import com.platform.selfcare.enums.RoleType;
 
 public class CustomUserDetails implements UserDetails {
 
@@ -65,5 +66,9 @@ public class CustomUserDetails implements UserDetails {
 
 	public void setUser(User user) {
 		this.user = user;
+	}
+	
+	public boolean isAdmin() {
+		return this.user.hasRole(RoleType.ADMIN.getName());	
 	}
 }

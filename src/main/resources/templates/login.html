@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Anmeldung</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+</head>
+<body>
+   <div>
+      <h1>Anmeldung</h1>
+      <div class="content">
+         <div th:if="${param.error}" class="alert alert-danger">
+            Benutzername oder Passwort ist falsch
+         </div>
+         <form name='f' th:action="@{/login}" method='POST'>
+         	<div class="form-group">
+         		<label class="col-form-label">E-Mail</label>
+         		<input type="email" name="email" class="form-control" required />
+         	</div>
+         	<div class="form-group mb-3">
+         		<label class="col-form-label">Passwort</label>
+         		<input type="password" name="password" class="form-control" required />
+         	</div>
+         	<div class="form-group mb-5">
+         		<input class="btn btn-primary" type="submit" value="Anmelden" />
+         	</div>
+         </form>
+      </div>
+   </div>
+   <footer>
+      <a href="/" rel="Mainpage">Startseite</a>
+   </footer>
+</body>
+</html>
