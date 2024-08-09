@@ -4,7 +4,10 @@ FROM maven:3.8.5-openjdk-17 AS build
 # copy all required files to docker container
 COPY src /app/src
 COPY certs/localhost.p12 src/main/resources
+
 COPY pom.xml /app
+
+VOLUME /var/run/docker.sock:/var/run/docker.sock
 
 # start build process by maven
 RUN mvn -f /app/pom.xml clean package -Dmaven.test.skip

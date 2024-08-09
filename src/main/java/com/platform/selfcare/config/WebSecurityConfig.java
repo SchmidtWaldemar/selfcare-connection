@@ -59,7 +59,6 @@ public class WebSecurityConfig {
 				login
 					.loginPage("/login")
 					.failureUrl("/login?error=true")
-					//.failureUrl("/login_error")
 					.usernameParameter("email")
 					.defaultSuccessUrl("/", true)
 					.successHandler(authSuccessHandler)

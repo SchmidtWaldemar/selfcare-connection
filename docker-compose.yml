@@ -19,11 +19,11 @@ services:
     image: mariadb:11.4.2 # use the last version of mariaDB
     env_file: ./.env # watch config file .env and change there the data for live mode!
     environment:
-      - MYSQL_DATABASE=$PROD_MYSQLDB_DATABASE
-      - MYSQL_USER=$PROD_MYSQLDB_USER
-      - MYSQL_PASSWORD=$PROD_MYSQLDB_PASSWORD # change credentials in .env
+      - MARIADB_DATABASE=$PROD_MARIADB_DATABASE
+      - MARIADB_USER=$PROD_MARIADB_USER
+      - MARIADB_PASSWORD=$PROD_MARIADB_PASSWORD # change credentials in .env
     ports:
-      - $PROD_MYSQLDB_LOCAL_PORT:$PROD_MYSQLDB_DOCKER_PORT # port forwarding to standrad mariaDB port 
+      - $PROD_MARIADB_LOCAL_PORT:$PROD_MARIADB_DOCKER_PORT # port forwarding to standrad mariaDB port 
     networks:
       - internalnetwork # use only intern network for communication and never outside the server
     restart: unless-stopped
@@ -43,10 +43,10 @@ services:
       - "8443:8443" # use only secure port with ssl protocol
     environment: # database data information and credentials you find in spring boot application properties
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url"  : "jdbc:mysql://maria_db:$PROD_MYSQLDB_DOCKER_PORT/$PROD_MYSQLDB_DATABASE",
-        "spring.datasource.username" : "$PROD_MYSQLDB_USER",
-        "spring.datasource.password" : "$PROD_MYSQLDB_PASSWORD",
-        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
+        "spring.datasource.url"  : "jdbc:mariadb://maria_db:$PROD_MARIADB_DOCKER_PORT/$PROD_MARIADB_DATABASE",
+        "spring.datasource.username" : "$PROD_MARIADB_USER",
+        "spring.datasource.password" : "$PROD_MARIADB_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MariaDBDialect",
         "spring.jpa.properties.hibernate.dialect.storage_engine" : "innodb",
         "spring.jpa.hibernate.ddl-auto" : "create"
        }'

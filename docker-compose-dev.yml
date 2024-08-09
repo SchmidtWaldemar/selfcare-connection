@@ -20,15 +20,15 @@ services:
     image: mariadb:11.4.2
     env_file: ./.env
     environment:
-      - MYSQL_DATABASE=$DEV_MYSQLDB_DATABASE
-      - MYSQL_USER=$DEV_MYSQLDB_USER
-      - MYSQL_PASSWORD=$DEV_MYSQLDB_PASSWORD
+      - MARIADB_DATABASE=$DEV_MARIADB_DATABASE
+      - MARIADB_USER=$DEV_MARIADB_USER
+      - MARIADB_PASSWORD=$DEV_MARIADB_PASSWORD
     volumes:
       - data:/var/lib/mysql
       - ./init-dev.sql:/data/application/init-dev.sql
     command: --init-file /data/application/init-dev.sql
     ports:
-      - $DEV_MYSQLDB_LOCAL_PORT:$DEV_MYSQLDB_DOCKER_PORT
+      - $DEV_MARIADB_LOCAL_PORT:$DEV_MARIADB_DOCKER_PORT
     networks:
       - internalnetwork
     restart: unless-stopped
@@ -43,10 +43,10 @@ services:
       - "8443:8443"
     environment:
       SPRING_APPLICATION_JSON: '{
-        "spring.datasource.url"  : "jdbc:mysql://maria_db:$DEV_MYSQLDB_DOCKER_PORT/$DEV_MYSQLDB_DATABASE",
-        "spring.datasource.username" : "$DEV_MYSQLDB_USER",
-        "spring.datasource.password" : "$DEV_MYSQLDB_PASSWORD",
-        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MySQLDialect",
+        "spring.datasource.url"  : "jdbc:mariadb://maria_db:$DEV_MARIADB_DOCKER_PORT/$DEV_MARIADB_DATABASE",
+        "spring.datasource.username" : "$DEV_MARIADB_USER",
+        "spring.datasource.password" : "$DEV_MARIADB_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.MariaDBDialect",
         "spring.jpa.properties.hibernate.dialect.storage_engine" : "innodb",
         "spring.jpa.hibernate.ddl-auto" : "create"
        }'
@@ -59,6 +59,17 @@ services:
       - .m2:/root/.m2
     stdin_open: true
     tty: true
+  tests:
+    image: maven:3
+    stop_signal: SIGKILL
+    stdin_open: true
+    tty: true
+    working_dir: $PWD
+    volumes:
+      - $PWD:$PWD
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.m2:/root/.m2
+    command: mvn test
 
 networks:
   internalnetwork:
