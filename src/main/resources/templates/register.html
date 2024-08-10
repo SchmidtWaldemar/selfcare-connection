@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Registrierung</title> 
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="/css/style.css" />
+    
+    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+</head>
+<body>
+   <div>
+      <h1>Registrierung</h1>
+      <div class="content">
+         <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Fehler</div>
+         <div th:if="${param.message}" class="alert alert-info" th:text="${param.message}">Meldung</div>
+         <form name="f" th:action="@{/register/new}" th:object="${newAccount}" method="POST">
+         	<div class="form-group">
+         		<label class="col-form-label">Vorname</label>
+         		<input class="form-control" th:field="*{firstName}" />
+         	</div>
+         	<div class="form-group">
+         		<label class="col-form-label">Nachname</label>
+         		<input class="form-control" th:field="*{lastName}" />
+         	</div>
+         	<div class="form-group">
+         		<label class="col-form-label">E-Mail *</label>
+         		<input type="email" class="form-control" th:field="*{email}" required />
+         		<p class="alert alert-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+         	</div>
+         	<div class="form-group mb-3">
+         		<label class="col-form-label">Passwort *</label>
+         		<input type="password" th:field="*{password}" class="form-control" required />
+         		<p class="alert alert-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+         	</div>
+         	<div class="form-group mb-3">
+         		<label class="col-form-label">Passwort bestätigen *</label>
+         		<input type="password" th:field="*{matchingPassword}" class="form-control" required />
+         		<p class="alert alert-danger" th:if="${#fields.hasErrors('matchingPassword')}" th:errors="*{matchingPassword}"></p>
+         	</div>
+         	<div class="form-group mb-5">
+         		<input class="btn btn-primary" type="submit" value="Registrieren" />
+         	</div>
+         </form>
+      </div>
+   </div>
+   <footer>
+      <a href="/" rel="Mainpage">Startseite</a>
+   </footer>
+</body>
+</html>

@@ -1,9 +1,14 @@
 # Änderungsübersicht
 
+## Update 10-08-2024
+Benutzer registrieren und E-Mail Verifizierung
+
+mehr dazu: [Benutzerregistrierung](08_registeration.md)
+
 ## Update 09-08-2024
 JUnit Tests mit Docker und SSL
 
-mehr dazu: [Anmeldung individualisieren](07_test_cases_with_docker.md)
+mehr dazu: [JUnit Tests](07_test_cases_with_docker.md)
 
 ## Update 08-08-2024
 Individuelle Anpassung der Anmeldung

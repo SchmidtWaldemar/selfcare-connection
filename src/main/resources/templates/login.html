@@ -16,6 +16,7 @@
          <div th:if="${param.error}" class="alert alert-danger">
             Benutzername oder Passwort ist falsch
          </div>
+         <div th:if="${param.message}" class="alert alert-info" th:text="${param.message}">Meldung</div>
          <form name='f' th:action="@{/login}" method='POST'>
          	<div class="form-group">
          		<label class="col-form-label">E-Mail</label>

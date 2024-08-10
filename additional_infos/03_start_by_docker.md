@@ -37,6 +37,8 @@ chmod a+r /etc/apt/keyrings/docker.asc
 echo   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
 $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+sudo apt update
+
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
 ```
 
@@ -52,6 +54,12 @@ Die Testumgebung ist Ihr eigener Rechner und die Applikation ist in der Regel ni
 
 ```
 docker-compose -f docker-compose-dev.yml up --build -d
+```
+
+Wenn hier eine Fehlermeldung auftaucht, dass ein Netzwerk fehlt, dann den folgenden Befehl aufrufen und danach wieder den Befehl davor:
+
+```
+docker network create proxy-network
 ```
 
 Nach einem erfolgreichen Start, sollten Meldung unten wie folgt aussehen.
@@ -162,7 +170,7 @@ tar xvzf selfcare-connection.tar.gz
 cd ~/selfcare-connection/
 ```
 
-Nun haben wir unsere Applikation auf dem Server und befinden uns im korrekten Verzeichnis für unsere Ausführung. Doch zunächst müssen wir die 'nginx.conf' Datei anpassen und ein Zertifikat z.B. von letsencrypt installieren.
+Nun haben wir unsere Applikation auf dem Server und befinden uns im korrekten Verzeichnis für unsere Ausführung. Doch zunächst müssen wir die 'nginx.conf' Datei anpassen (statt 'your-domain.net' auf Ihre Adresse ändern) und ein Zertifikat z.B. von letsencrypt installieren.
 
 Bevor wir jedoch das Internet auf unseren Server lassen, richten wir die Firewall ein:
 
@@ -172,6 +180,7 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 sudo ufw allow ssh
 sudo ufw allow 22
+sudo ufw allow 80
 sudo ufw allow 443
 sudo ufw enable
 ```
@@ -186,6 +195,13 @@ certbot --nginx --agree-tos --redirect --hsts --staple-ocsp --email test@your-do
 ls /etc/letsencrypt/live/
 ```
 
+Sollte die Ausführung des oben genannten Scripts nicht funktionieren, muss vorher nginx als Server installiert und gestartet werden. Wenn danach der Script ausgeführt wird und die Letsencrypt Zertifikate vorhanden sind, muss Nginx wieder beendet werden, damit unser Docker auch erfolgreich wieder gestartet werden kann. Am besten ist, wenn Sie den Nginx Server komplett deaktivieren, damit dieser nicht beim Neustart des System automatisch wieder gestartet wird. ACHTUNG: sichert vorher alle vorherigen Einstallungen von Nginx falls solche vorhanden sind:
+
+```
+systemctl stop nginx.service
+systemctl disable nginx.service
+```
+
 Wenn das Zertifikat erfolgreich erstellt werden konnte, so sollte die letzte ls Abfrage einige Verzeichnisse oder Dateien bereits anzeigen.
 Wenn die Letsencrypt Dateien nicht erfolgreich angelegt werden konnten, dann müssen wir unsere Firewall Regeln prüfen und sicherstellen, dass auch z.B. unser Rechner daheim mit Ping sowohl mit der IP als auch der Domain erreichbar ist. 
 
@@ -197,6 +213,7 @@ mkdir -p certs/
 cd certs/
 openssl pkcs12 -export -out localhost.p12 -inkey /etc/letsencrypt/live/your-domain.net/privkey.pem -in /etc/letsencrypt/live/your-domain.net/cert.pem -certfile /etc/letsencrypt/live/your-domain.net/chain.pem
 ```
+
 
 Nun ändern wir unter der 'nginx.conf' Datei die Domain 'your-domain.net' auf unsere Domain. Dies sollte an 3 Stellen der Fall sein. Danach sind wir bereit unsere Plattform zu starten:
 
@@ -240,3 +257,11 @@ cat /var/log/keystore-cron.log
 ```
 
 Viele der genannten Scripte wie zum Beispiel unter '~/keystore_renew.sh' habe ich Freihand eingefügt und nicht ausprobiert. Sollten sich so irgenwo Fehler eingeschlichen haben, könnt Ihr mir gerne z.B. unter Kontakte bei anonym-chat.de einen Kommentar dazu hinterlassen, damit ich es bei Zeiten korrigieren kann.
+
+#### Troubleshooting
+
+Funktioniert der Aufruf mit Curl weiterhin nicht, dann vermutlich wegen dem Zertifikat. Kopieren Sie das Zertifikat aus dem certs Ordner in den resource Bereich und starten Sie Docker neu:
+
+```
+cp certs/localhost.p12 src/main/resources/certs/
+```

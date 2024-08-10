@@ -22,6 +22,7 @@ services:
       - MARIADB_DATABASE=$PROD_MARIADB_DATABASE
       - MARIADB_USER=$PROD_MARIADB_USER
       - MARIADB_PASSWORD=$PROD_MARIADB_PASSWORD # change credentials in .env
+      - MARIADB_ROOT_PASSWORD=$PROD_MARIADB_ROOT_PASSWORD # required in live mode
     ports:
       - $PROD_MARIADB_LOCAL_PORT:$PROD_MARIADB_DOCKER_PORT # port forwarding to standrad mariaDB port 
     networks:

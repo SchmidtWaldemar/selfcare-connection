@@ -31,8 +31,12 @@
                 <input class="link" type="submit" value="Abmelden" />
             </form>
         </div>
+		<div th:unless="${me}" class="mb-3">
+		    <a href="/register/" rel="Registrieren">Account anlegen</a>
+		</div>
         <div th:unless="${me}">
-            <a href="/login" rel="Logout">Anmelden</a>
+        	<p>oder</p>
+			<a href="/login" rel="Logout">Anmelden</a>
         </div>
     </footer>
 </body>
