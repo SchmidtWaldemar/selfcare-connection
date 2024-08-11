@@ -7,7 +7,7 @@ import com.platform.selfcare.validation.ValidPassword;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-@PasswordMatches
+@PasswordMatches(matchingPassword = "matchingPassword", password = "password")
 public class RegisterUserDto {
 
 	@ValidPassword

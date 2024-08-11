@@ -1,5 +1,10 @@
 # Änderungsübersicht
 
+## Update 11-08-2024
+Passwörter ändern
+
+mehr dazu: [Passwort Änderungen](09_password_changing.md)
+
 ## Update 10-08-2024
 Benutzer registrieren und E-Mail Verifizierung
 

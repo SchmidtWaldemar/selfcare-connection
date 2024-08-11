@@ -27,6 +27,10 @@
             <div th:if="${me.isAdmin()}" class="mb-3">
                 <a href="/admin" rel="Admin">Zur Administration</a>
             </div>
+            <div th:if="${me.user.hasRole('USER')}" class="mb-5">
+                <a href="/updateOldPassword" rel="Passwortaenderung">Passwort ändern</a>
+            </div>
+            
             <form th:action="@{/logout}" method="POST">
                 <input class="link" type="submit" value="Abmelden" />
             </form>

@@ -1,7 +1,6 @@
 package com.platform.selfcare.service;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Optional;
@@ -49,8 +48,7 @@ public class UserService implements IUserService {
 			throw new UserAlreadyExistsException("User account already exists!");
 		}
 		
-		BCryptPasswordEncoder pwEncoder = new BCryptPasswordEncoder();
-		String encodedPw = "{BCRYPT}" + pwEncoder.encode(userDto.getPassword());
+		String encodedPw = getEncryptedPassword(userDto.getPassword());
 		
 		final User user = new User(userDto.getEmail(), encodedPw);
 		user.setFirstName(userDto.getFirstName());
@@ -59,15 +57,38 @@ public class UserService implements IUserService {
 		return this.userRepository.save(user);
 	}
 
+	private String getEncryptedPassword(final String password) {
+		BCryptPasswordEncoder pwEncoder = new BCryptPasswordEncoder();
+		return "{BCRYPT}" + pwEncoder.encode(password);
+	}
+
 	@Override
-	public void sendConfirmationMailByUser(String appUrl, Locale locale, User user) {
+	public void sendConfirmationMailByUserAndType(String appUrl, Locale locale, User user, TokenType type) {
+		Optional<VerificationToken> existingToken = this.tokenRepository.findByUserAndType(user, type);
+		if (existingToken.isPresent()) {
+			if (existingToken.get().isExpired()) {
+				tokenRepository.delete(existingToken.get());
+			}
+			else {
+				// do nothing to prevent hacker sending SPAM to registered user
+				return;
+			}
+		}
+		
 		final String token = UUID.randomUUID().toString();
-		VerificationToken registerToken = new VerificationToken(token, user, TokenType.REGISTER_TOKEN);
-		this.tokenRepository.setAllExpiredByUserAndType(user, TokenType.REGISTER_TOKEN);
+		VerificationToken registerToken = new VerificationToken(token, user, type);
+		//this.tokenRepository.setAllExpiredByUserAndType(user, type);
 		this.tokenRepository.save(registerToken);
 		
 		try {
-			boolean sendStatus = this.sendService.sendRegistrationEmail(appUrl, locale, user, token);
+			boolean sendStatus = false;
+			if (type.equals(TokenType.REGISTER_TOKEN)) {
+				sendStatus = this.sendService.sendRegistrationEmail(appUrl, locale, user, token);
+			}
+			else if (type.equals(TokenType.PASSWORD_TOKEN)) {
+				sendStatus = this.sendService.sendPasswordForgotten(appUrl, locale, user, token);
+			}
+			
 			if (!sendStatus) {
 				System.err.println("failed to send mail");
 			}
@@ -77,7 +98,7 @@ public class UserService implements IUserService {
 	}
 
 	@Override
-	public VerificationToken validateVerificationToken(String token, TokenType type) {
+	public VerificationToken validateVerificationToken(String token, TokenType type, boolean devaluate) {
 		if (token == null || token.isBlank()) {
 			return new VerificationToken(TokenStatus.TOKEN_NOT_EXIST);
 		}
@@ -88,29 +109,63 @@ public class UserService implements IUserService {
 		}
 		
 		final User user = verificatedToken.get().getUser();
-		final Calendar cal = Calendar.getInstance();
-		if ((verificatedToken.get().getExpireDate().getTime() - cal.getTime().getTime()) <= 0) {
+		
+		if (verificatedToken.get().isExpired()) {
 			tokenRepository.delete(verificatedToken.get());
 			verificatedToken.get().setStatus(TokenStatus.TOKEN_EXPIRED);
 			return verificatedToken.get();
 		}
 		
-		user.setEnabled(true);
-		Optional<Role> uRole = this.roleRepository.findByName(RoleType.USER.getName());
-		if (uRole.isPresent()) {
-			Set<Role> roles = new HashSet<Role>();
-			roles.add(uRole.get());
-			user.setRoles(roles);
+		boolean success = false;
+		if (type.equals(TokenType.REGISTER_TOKEN)) {
+			user.setEnabled(true);
+			Optional<Role> uRole = this.roleRepository.findByName(RoleType.USER.getName());
+			if (uRole.isPresent()) {
+				Set<Role> roles = new HashSet<Role>();
+				roles.add(uRole.get());
+				user.setRoles(roles);
+				success = true;
+			}
 		}
-		else {
+		else if (type.equals(TokenType.PASSWORD_TOKEN)) {
+			success = true;
+		}
+		
+		if (!success) {
 			verificatedToken.get().setStatus(TokenStatus.ERROR);
 			return verificatedToken.get();
 		}
 		
-		tokenRepository.delete(verificatedToken.get());
+		if (devaluate) {
+			tokenRepository.delete(verificatedToken.get());
+		}
 		userRepository.save(user);
 		
 		verificatedToken.get().setStatus(TokenStatus.TOKEN_VALID);
 		return verificatedToken.get();
+	}
+
+	@Override
+	public Optional<User> findUserByEmail(String email) {
+		return this.userRepository.findByEmail(email);
+	}
+
+	@Override
+	public void changePassword(User user, final String newPassword) {
+		user.setPassword(getEncryptedPassword(newPassword));
+		this.userRepository.save(user);
+	}
+
+	@Override
+	public boolean checkPasswordMatched(User user, String oldPassword) {
+		if (oldPassword == null || oldPassword.isBlank()) return false;
+		
+		BCryptPasswordEncoder crypt = new BCryptPasswordEncoder();
+		return crypt.matches(oldPassword, user.getPassword().replaceFirst("\\{BCRYPT\\}", ""));
+	}
+
+	@Override
+	public Optional<VerificationToken> findTokenByUser(User user, TokenType type) {
+		return this.tokenRepository.findByUserAndType(user, type);
 	}
 }

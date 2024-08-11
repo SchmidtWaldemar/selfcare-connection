@@ -5,9 +5,9 @@ import java.util.Locale;
 import com.platform.selfcare.entity.User;
 
 @SuppressWarnings("serial")
-public class OnRegistrationCompleteEvent extends OnUserSendMailEvent {
-	
-	public OnRegistrationCompleteEvent(final User user, final Locale locale, final String appUrl) {
+public class OnPasswordForgottenEvent extends OnUserSendMailEvent {
+
+	public OnPasswordForgottenEvent(User user, Locale locale, String appUrl) {
 		super(user, locale, appUrl);
 	}
 }

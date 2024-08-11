@@ -113,6 +113,11 @@ public class VerificationToken {
 	public void setStatus(TokenStatus status) {
 		this.status = status;
 	}
+	
+	public boolean isExpired() {
+		final Calendar cal = Calendar.getInstance();
+		return this.expireDate.before(cal.getTime());
+	}
 
 	private Date calculateExpireDate(int expiration) {
 		final Calendar cal = Calendar.getInstance();

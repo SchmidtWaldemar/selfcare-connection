@@ -17,7 +17,13 @@ public interface TokenRepository extends JpaRepository<VerificationToken, Long> 
 	
 	Optional<VerificationToken> findByTokenAndType(String token, TokenType type);
 	
+	/**
+	 * can not have two entries by OneToOne
+	 */
+	@Deprecated
 	@Modifying
 	@Query("UPDATE VerificationToken t SET t.expireDate = now() WHERE t.user = :user AND t.type = :type")
 	void setAllExpiredByUserAndType(User user, TokenType type);
+	
+	Optional<VerificationToken> findByUserAndType(User user, TokenType type);
 }

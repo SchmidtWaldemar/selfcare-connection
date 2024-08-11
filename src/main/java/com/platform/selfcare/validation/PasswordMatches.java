@@ -18,6 +18,10 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = PasswordMatchesValidator.class)
 public @interface PasswordMatches {
 
+	String password();
+	
+	String matchingPassword();
+	
 	/**
 	 * custom output message
 	 * 
@@ -28,4 +32,10 @@ public @interface PasswordMatches {
 	Class<?>[] groups() default {};
 	
 	Class<? extends Payload>[] payload() default {};
+	
+	@Target({ ElementType.TYPE })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface List {
+		PasswordMatches[] value();
+	}
 }

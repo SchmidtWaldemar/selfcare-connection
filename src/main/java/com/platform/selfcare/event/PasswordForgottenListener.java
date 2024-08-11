@@ -9,7 +9,7 @@ import com.platform.selfcare.service.ConfigService;
 import com.platform.selfcare.service.IUserService;
 
 @Component
-public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
+public class PasswordForgottenListener implements ApplicationListener<OnPasswordForgottenEvent> {
 	
 	@Autowired
 	IUserService userService;
@@ -18,9 +18,9 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 	ConfigService configService;
 	
 	@Override
-	public void onApplicationEvent(OnRegistrationCompleteEvent event) {
+	public void onApplicationEvent(OnPasswordForgottenEvent event) {
 		if (configService.getMailSenderActive()) {
-			this.userService.sendConfirmationMailByUserAndType(event.getAppUrl(), event.getLocale(), event.getUser(), TokenType.REGISTER_TOKEN);
+			this.userService.sendConfirmationMailByUserAndType(event.getAppUrl(), event.getLocale(), event.getUser(), TokenType.PASSWORD_TOKEN);
 		}
 	}
 }

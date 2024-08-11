@@ -2,6 +2,7 @@ package com.platform.selfcare.controller;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -18,9 +19,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.platform.selfcare.dto.RegisterUserDto;
 import com.platform.selfcare.entity.User;
 import com.platform.selfcare.entity.VerificationToken;
+import com.platform.selfcare.enums.RoleType;
 import com.platform.selfcare.enums.TokenStatus;
 import com.platform.selfcare.enums.TokenType;
 import com.platform.selfcare.event.OnRegistrationCompleteEvent;
+import com.platform.selfcare.exception.UserAlreadyExistsException;
 import com.platform.selfcare.service.IUserService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,11 +57,33 @@ public class RegisterController {
 			Model model) {
 		
 		if (result.hasErrors()) {
+			if (result.hasGlobalErrors()) {
+				model.addAttribute("globalError", result.getGlobalError().getDefaultMessage());
+			}
+			
 			redirectAttr.addFlashAttribute("newAccount", userDto);
 			return REDIRECT;
 		}
 		
-		final User registered = this.userService.registerNewUser(userDto);
+		User registered = null; 
+		try {
+			registered = this.userService.registerNewUser(userDto);
+		} catch (UserAlreadyExistsException e) {
+			Optional<User> user = this.userService.findUserByEmail(userDto.getEmail());
+			// check registered user is not verified first
+			if (user.isPresent() && !user.get().isEnabled() && !user.get().hasRole(RoleType.USER.getName())) {
+				// user has not activated registration
+				Optional<VerificationToken> verifiedToken = userService.findTokenByUser(user.get(), TokenType.REGISTER_TOKEN);
+				if (verifiedToken.isPresent() 
+						&& !verifiedToken.get().isExpired()) {
+					// ignore if token exists and is not expired 
+					return "error";
+				}
+				// sent new token to user with expired token
+				registered = user.get();
+			}
+		}
+		
 		this.eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), "https://" + request.getServerName() + request.getContextPath()));
 		
 		redirectAttr.asMap().clear();
@@ -73,7 +98,7 @@ public class RegisterController {
 	
 	@GetMapping("/registrationConfirm")
 	public String confirmRegistration(final HttpServletRequest request, Model model, @RequestParam("token") final String token) {
-		final VerificationToken verifiedToken = userService.validateVerificationToken(token, TokenType.REGISTER_TOKEN);
+		final VerificationToken verifiedToken = userService.validateVerificationToken(token, TokenType.REGISTER_TOKEN, true);
 		
 		if (verifiedToken.getStatus().equals(TokenStatus.TOKEN_VALID)) {
 			final User user = verifiedToken.getUser();

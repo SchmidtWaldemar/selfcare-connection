@@ -32,7 +32,7 @@ public class SendMailService implements ISendMailService {
 
 	@Override
 	public boolean sendPasswordForgotten(String appUrl, Locale locale, User user, String token) throws MessagingException, IOException {
-		final String confirmationUrl = appUrl + "/changePassword?token=" + token;
+		final String confirmationUrl = appUrl + "/changeForgottenPassword?token=" + token;
 		String message = "Sie haben die Passwort Vergessen Funktion beantragt? Wenn ja, klicken Sie bitte auf den folgenden Link: \n" + confirmationUrl;
 		return sentMailToUser(user.getEmail(), "Passwort Vergessen?", message);
 	}
