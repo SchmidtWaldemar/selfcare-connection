@@ -1,5 +1,11 @@
 # Änderungsübersicht
 
+## Update 12-08-2024
+Benutzer innerhalb der Admin aktivieren / deaktivieren
+
+mehr dazu: [Benutzer aktivieren / deaktivieren](10_change_enabled_status)
+
+
 ## Update 11-08-2024
 Passwörter ändern
 

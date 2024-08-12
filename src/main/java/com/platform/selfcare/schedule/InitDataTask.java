@@ -64,7 +64,8 @@ public class InitDataTask {
 				roles.add(uRole.get());
 				roles.add(aRole.get());
 				adminUser.setRoles(roles);
-				// TODO: set to false by using 2F authentication mode
+				// change default password with password forget or update password after login for admin!
+				// admin users should not be disabled
 				adminUser.setEnabled(true);
 				this.userRepository.save(adminUser);
 			}

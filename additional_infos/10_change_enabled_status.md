@@ -1,0 +1,5 @@
+# Benutzer aktivieren / deaktivieren
+
+Heute nur ein kleiner Update innerhalb der Admin. Die Funktion registrierte Benutzer zu aktivieren oder zu deaktivieren ist für die meisten Plattformen notwendig. Sollte der Benutzer durch die 2 Faktor Authorisierung, die während der Registrierung stattfindet, noch nicht aktiviert worden sein, dann sollte hier Vorsicht geboten sein: Die E-Mail kann unter Umständen nicht dem Benutzer gehören, weshalb eine Aktivierung bedeuten würde, dass der Benutzer unter einer fremden E-Mail die Plattform nutzen kann. Ansonten kann es notwendig sein, z.B. bei einer unberechtigten Sperre den Benutzer wieder freizuschalten. 
+
+Die Benutzer innerhalb der Amin werden nach Rollen sortiert angezeigt. Die Admin Nutzer können zum Beispiel nie deaktiviert werden und normale Nutzer dagegen schon. Sollte noch eine weitere Rolle, wie zum Beispiel Support oder Redaktion implementiert werden, so muss auch hier die Rollen-Hierarchie mit beachtet werden. In diesem Fall könnte man sich zum Beispiel vorstellen, dass die Admin Rolle alle, Support die Redaktion, sowie normale Nutzer und die Redaktion nur die normalen Nutzer sperren können sollen.

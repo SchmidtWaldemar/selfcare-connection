@@ -2,6 +2,7 @@ package com.platform.selfcare.service;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
@@ -118,14 +119,8 @@ public class UserService implements IUserService {
 		
 		boolean success = false;
 		if (type.equals(TokenType.REGISTER_TOKEN)) {
-			user.setEnabled(true);
-			Optional<Role> uRole = this.roleRepository.findByName(RoleType.USER.getName());
-			if (uRole.isPresent()) {
-				Set<Role> roles = new HashSet<Role>();
-				roles.add(uRole.get());
-				user.setRoles(roles);
-				success = true;
-			}
+			setUserEnableStatus(user, true);
+			success = true;
 		}
 		else if (type.equals(TokenType.PASSWORD_TOKEN)) {
 			success = true;
@@ -139,10 +134,21 @@ public class UserService implements IUserService {
 		if (devaluate) {
 			tokenRepository.delete(verificatedToken.get());
 		}
-		userRepository.save(user);
 		
 		verificatedToken.get().setStatus(TokenStatus.TOKEN_VALID);
 		return verificatedToken.get();
+	}
+
+	@Override
+	public void setUserEnableStatus(final User user, boolean enableStatus) {
+		user.setEnabled(enableStatus);
+		Optional<Role> uRole = this.roleRepository.findByName(RoleType.USER.getName());
+		if (uRole.isPresent() && !user.hasRole(RoleType.USER.getName())) {
+			Set<Role> roles = new HashSet<Role>();
+			roles.add(uRole.get());
+			user.setRoles(roles);
+		}
+		userRepository.save(user);
 	}
 
 	@Override
@@ -167,5 +173,23 @@ public class UserService implements IUserService {
 	@Override
 	public Optional<VerificationToken> findTokenByUser(User user, TokenType type) {
 		return this.tokenRepository.findByUserAndType(user, type);
+	}
+
+	@Override
+	public List<User> findAllUserByRole(RoleType role) {
+		List<User> allUser = this.userRepository.findAll();
+		List<User> result = null;
+		if (allUser != null && allUser.size() > 0) {
+			if (role.equals(RoleType.USER)) {
+				// filter users with more privileges
+				// change filter after insert more roles
+				result = allUser.stream().filter(u -> !u.hasRole(RoleType.ADMIN.getName())).toList();
+			}
+			else if (role.equals(RoleType.ADMIN)) {
+				result = allUser.stream().filter(u -> u.hasRole(RoleType.ADMIN.getName())).toList();
+			}
+		}
+		
+		return result;
 	}
 }

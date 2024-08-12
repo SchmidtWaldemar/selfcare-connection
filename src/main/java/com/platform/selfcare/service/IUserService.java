@@ -1,11 +1,14 @@
 package com.platform.selfcare.service;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
 import com.platform.selfcare.dto.RegisterUserDto;
+import com.platform.selfcare.entity.Role;
 import com.platform.selfcare.entity.User;
 import com.platform.selfcare.entity.VerificationToken;
+import com.platform.selfcare.enums.RoleType;
 import com.platform.selfcare.enums.TokenType;
 
 /**
@@ -76,4 +79,21 @@ public interface IUserService {
 	 * @return token if exists
 	 */
 	Optional<VerificationToken> findTokenByUser(User user, TokenType type);
+	
+	/**
+	 * fetch all users by role
+	 * 
+	 * @param role role to fetch
+	 * 
+	 * @return list of result
+	 */
+	List<User> findAllUserByRole(RoleType role);
+
+	/**
+	 * enable user and set user role if required
+	 * 
+	 * @param user user to enable
+	 * @param enableStatus status to change
+	 */
+	void setUserEnableStatus(User user, boolean enableStatus);
 }
