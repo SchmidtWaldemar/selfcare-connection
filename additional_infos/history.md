@@ -1,10 +1,14 @@
 # Änderungsübersicht
 
+## Update 14-08-2024
+Konzept und Realisierung
+
+mehr dazu: [Konzept und Realisierung](11_concept_and_implement.md)
+
 ## Update 12-08-2024
 Benutzer innerhalb der Admin aktivieren / deaktivieren
 
-mehr dazu: [Benutzer aktivieren / deaktivieren](10_change_enabled_status)
-
+mehr dazu: [Benutzer aktivieren / deaktivieren](10_change_enabled_status.md)
 
 ## Update 11-08-2024
 Passwörter ändern

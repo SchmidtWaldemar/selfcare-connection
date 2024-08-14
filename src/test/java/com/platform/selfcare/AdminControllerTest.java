@@ -68,7 +68,7 @@ public class AdminControllerTest {
     	this.mvc.perform(MockMvcRequestBuilders.post("/enableStatusUser")
     			.session((MockHttpSession) session)
     			.content(asJsonString(user))
-    			.param("enableStatus", "false")
+    			.param("enableStatus", "true")
     			.with(csrf())
     			.accept(MediaType.APPLICATION_JSON))
     				.andExpect(view().name("admin"))
