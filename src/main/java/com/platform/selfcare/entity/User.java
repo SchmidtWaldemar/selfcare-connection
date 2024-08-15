@@ -11,6 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.platform.selfcare.validation.ValidEmail;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,6 +47,15 @@ public class User {
 	@ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
+	
+	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "member_groups", 
+    	joinColumns = 
+    		@JoinColumn(name = "user_id"), 
+    	inverseJoinColumns = 
+    		@JoinColumn(name = "group_id")
+    )
+	private Set<Group> groups = new HashSet<>();
 	
 	@Column(name = "enabled", nullable = false, columnDefinition = "boolean default false")
 	private boolean enabled;
@@ -136,5 +146,13 @@ public class User {
 			authorities.add(new SimpleGrantedAuthority(role.getName()));
 		}
 		return authorities;
+	}
+
+	public Set<Group> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(Set<Group> groups) {
+		this.groups = groups;
 	}
 }

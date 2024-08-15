@@ -14,3 +14,53 @@ body {
 	cursor: pointer;
 	font-size: inherit;
 }
+
+.post-container {
+	margin-top: 20px;
+	padding: 10px 10px 0px 10px;
+	background: beige;
+}
+
+blockquote {
+	padding: 10px 0px;
+	margin: 10px 0 20px 1px;
+	border-left-width: 0;
+	border-right-width: 0;
+	border-bottom-width: 0;
+	border-style: solid;
+	
+	background: lightgrey;
+	box-shadow: 1px 2px 2px 0 grey;
+	padding-right: 5px;
+	padding-left: 10px;
+}
+
+.post-content {
+	color: #443312;
+	border-bottom: 1px solid #f2f2f2;
+	padding-bottom: 5px;
+	margin-bottom: 20px;
+}
+
+.post-info {
+	text-align: end;
+	font-size: small;
+	color: grey;
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.bottom-ctl {
+	margin-top: 20px;
+}
+
+.inline-content {
+	display: flex;
+	justify-content: space-between;
+}
+
+.card {
+	margin-bottom: 10px;
+}
+

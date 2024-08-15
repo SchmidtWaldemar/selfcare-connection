@@ -1,5 +1,10 @@
 # Änderungsübersicht
 
+## Update 15-08-2024
+Feinkonzept mit Klassendiagramm und Implementierung
+
+mehr dazu: [Implementierung eines Feinkonzepts](12_implement_group_concept.md)
+
 ## Update 14-08-2024
 Konzept und Realisierung
 

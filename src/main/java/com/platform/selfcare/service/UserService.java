@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.platform.selfcare.dto.RegisterUserDto;
+import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.Role;
 import com.platform.selfcare.entity.User;
 import com.platform.selfcare.entity.VerificationToken;
@@ -20,6 +21,7 @@ import com.platform.selfcare.enums.RoleType;
 import com.platform.selfcare.enums.TokenStatus;
 import com.platform.selfcare.enums.TokenType;
 import com.platform.selfcare.exception.UserAlreadyExistsException;
+import com.platform.selfcare.repository.CandidateRepository;
 import com.platform.selfcare.repository.RoleRepository;
 import com.platform.selfcare.repository.TokenRepository;
 import com.platform.selfcare.repository.UserRepository;
@@ -40,6 +42,9 @@ public class UserService implements IUserService {
 	
 	@Autowired
 	RoleRepository roleRepository;
+	
+	@Autowired
+	CandidateRepository candidateRepository;
 	
 	@Override
 	public User registerNewUser(RegisterUserDto userDto) {
@@ -191,5 +196,10 @@ public class UserService implements IUserService {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public List<Candidate> getCandidatures(User user) {
+		return this.candidateRepository.findCandidatures(user);
 	}
 }

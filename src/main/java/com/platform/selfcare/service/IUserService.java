@@ -5,7 +5,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 import com.platform.selfcare.dto.RegisterUserDto;
-import com.platform.selfcare.entity.Role;
+import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.User;
 import com.platform.selfcare.entity.VerificationToken;
 import com.platform.selfcare.enums.RoleType;
@@ -96,4 +96,13 @@ public interface IUserService {
 	 * @param enableStatus status to change
 	 */
 	void setUserEnableStatus(User user, boolean enableStatus);
+	
+	/**
+	 * fetch all candidate entries
+	 * 
+	 * @param user reference of candidatures
+	 * 
+	 * @return list of candidate entities
+	 */
+	List<Candidate> getCandidatures(User user);
 }

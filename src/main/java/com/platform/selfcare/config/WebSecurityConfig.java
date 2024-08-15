@@ -46,7 +46,7 @@ public class WebSecurityConfig {
 			.authorizeHttpRequests((authHttpRequest) -> 
 				authHttpRequest
 					.requestMatchers("/admin", "/enableStatusUser").hasRole("ADMIN")
-					.requestMatchers("/overview", "/saveUpdatedPassword").hasRole("USER")
+					.requestMatchers("/overview", "/saveUpdatedPassword", "/group").hasRole("USER")
 					.requestMatchers("/**").permitAll()
 			)
 			.csrf(csrf -> 
