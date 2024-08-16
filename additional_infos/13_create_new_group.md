@@ -1,0 +1,3 @@
+# Neue Gruppe erstellen
+
+Heute sollte wegen Zeitmangel nur ein kleines Update genügen. Selbsthilfegruppen können erstellt und angezeigt werden. Die jeweilige Gruppe kann auch nur vom Erzeuger besucht werden. Die Anmeldung zum Gruppenbeitritt soll in den kommenden Aufgaben stattfinden. Hier sei bereits anzumerken, dass eine Kommunikation zwischen den Teilnehmern eine datenschutzrechtlich heikle Angelegenheit sein kann. Hier muss eine Datenschutzregelung und ein Impressum innerhalb der Seite nicht fehlen. Dafür soll ebenfalls in den kommenden Aufgaben das Layout entprechend angepasst sein, damit die rechtlich notwendigen Inhalte von allen Seiten aus leicht zugänglich sind.

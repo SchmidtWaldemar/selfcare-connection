@@ -22,7 +22,7 @@
             </div>
 
             <div th:if="${me.user.hasRole('USER')}" class="mb-3">
-                <a href="/overview" rel="Overview">Zur Übersicht</a>
+                <a href="/overview" rel="Overview">Selbsthilfegruppen anzeigen</a>
             </div>
             <div th:if="${me.isAdmin()}" class="mb-3">
                 <a href="/admin" rel="Admin">Zur Administration</a>

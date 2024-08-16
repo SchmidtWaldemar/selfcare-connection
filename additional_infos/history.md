@@ -1,5 +1,10 @@
 # Änderungsübersicht
 
+## Update 16-08-2024
+Erzeugung neuer Selbsthilfegruppen
+
+mehr dazu: [Neue Gruppe erstellen](13_create_new_group.md)
+
 ## Update 15-08-2024
 Feinkonzept mit Klassendiagramm und Implementierung
 

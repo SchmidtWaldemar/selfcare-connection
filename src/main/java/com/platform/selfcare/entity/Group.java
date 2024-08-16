@@ -1,8 +1,11 @@
 package com.platform.selfcare.entity;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.platform.selfcare.enums.RoleType;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -16,7 +19,10 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name="groups")
@@ -52,7 +58,16 @@ public class Group {
 	@Column(name = "active", nullable = false, columnDefinition = "boolean default true")
 	private Boolean active;
 	
-	Group() {}
+	@Column(updatable = false, nullable = false)
+	private Date created;
+	
+	@Column(nullable = false)
+	private Date lastUpdate;
+	
+	@Transient
+	private boolean authorized;
+	
+	public Group() {}
 
 	public Long getId() {
 		return id;
@@ -123,5 +138,48 @@ public class Group {
 
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	public boolean isMember(User user) {
+		return this.members != null ? this.members.contains(user) : false;
+	}
+	
+	public boolean isAuthorized(User me) {
+		return me.hasRole(RoleType.ADMIN.getName()) || this.getCreator().equals(me) || isMember(me);
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+	
+	@PrePersist
+	protected void onCreate() {
+		this.created = new Date();
+		this.lastUpdate = new Date();
+	}
+	
+	@PreUpdate
+	protected void onUpdate() {
+		this.lastUpdate = new Date();
+	}
+
+	public boolean isAuthorized() {
+		return authorized;
+	}
+
+	public void setAuthorized(boolean authorized) {
+		this.authorized = authorized;
 	}
 }

@@ -13,36 +13,32 @@
    <div>
       <h1>Alle Gruppen im Überblick</h1>
       <div class="content mb-3">
-      
-         <div class="card">
+      	
+      	<div class="card" th:if="${groups}" th:each="group : ${groups}">
 		  <div class="card-header inline-content">
 		  	<div>
-			    erstellt am 15.08.2024
+			    erstellt <span th:text="${#dates.format(group.created, 'dd.MM.yyyy HH:mm')}"></span>
 		  	</div>
 		  	<div>
-		  		von Max Musterfrau
+		  		von <span th:text="${group.creator.firstName} + ' ' + ${group.creator.lastName}"></span>
 		  	</div>
 		  </div>
 		  <div class="card-body">
-		    <h5 class="card-title">Sprechen wir heute mal über Angst</h5>
-		    <p class="card-text">Speziell über die soziale Phobie. Wer Lust hat, kann sich bei mir anmelden.</p>
-		    <a href="/group" class="btn btn-success">Zur Gruppe</a>
+		    <h5 class="card-title" th:text="${group.title}">Titel</h5>
+		    <p th:if="${group.description.length > 0}" class="card-text" th:text="${group.description}">Beschreibung</p>
+		    <p th:unless="${group.description.length > 0}" class="card-text"><i>keine Beschreibung hinzugefügt</i></p>
+		    <a th:if="${group.authorized}" th:href="'/group/' + ${group.id}" class="btn btn-success">Zur Gruppe</a>
+		    <a th:unless="${group.authorized}" th:href="'/group/register/' + ${group.id}" class="btn btn-primary">Zum Beitritt anmelden</a>
 		  </div>
 		</div>
-		<div class="card">
-		  <div class="card-header inline-content">
-		  	<div>
-			    erstellt am 15.08.2024
-		  	</div>
-		  	<div>
-		  		von Maxi Mustermann
-		  	</div>
-		  </div>
-		  <div class="card-body">
-		    <h5 class="card-title">Angstfrei durch den Tag</h5>
-		    <p class="card-text">Wie ich meine Angst überwunden habe.</p>
-		    <a href="#" class="btn btn-primary">Anmelden</a>
-		  </div>
+		<div th:unless="${groups.size() > 0}">
+			<p>
+				Noch keine Gruppen vorhanden.
+			</p>
+		</div>
+      	
+		<div class="bottom-ctl right">
+			<a href="/group/new" rel="Neue Gruppe erstellen" class="btn btn-primary">Neue Gruppe erstellen</a>
 		</div>
       </div>
    </div>

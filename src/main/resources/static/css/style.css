@@ -7,6 +7,10 @@ body {
 	flex-flow: column;
 }
 
+h1 {
+	margin-bottom: 20px;
+}
+
 .link { 
 	background: none;
 	border: none;
@@ -64,3 +68,6 @@ blockquote {
 	margin-bottom: 10px;
 }
 
+.right {
+	text-align: right;
+}
