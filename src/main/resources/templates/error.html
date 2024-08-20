@@ -1,23 +1,22 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Fehler</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Fehler</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
+
 <body>
-   <div>
-      <h1>Fehler</h1>
-      <div class="content mb-3">
-         Upps! Da ist offenbar etwas schiefgelaufen!
-      </div>
-   </div>
-   <footer>
-      <a href="/" rel="Mainpage">Startseite</a>
-   </footer>
+	<div class="content-area content-low-height">
+	   <h1>Fehler</h1>
+	   <div class="content mb-3">
+	      Upps! Da ist offenbar etwas schiefgelaufen!
+	   </div>
+	</div>
+
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

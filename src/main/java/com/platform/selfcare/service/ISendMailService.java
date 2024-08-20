@@ -38,4 +38,15 @@ public interface ISendMailService {
 	 * @throws IOException
 	 */
 	boolean sendPasswordForgotten(final String appUrl, final Locale locale, final User user, final String token) throws MessagingException, IOException;
+
+	/**
+	 * send status of candidates to creator of group
+	 * 
+	 * @param user to sent message
+	 * @param candidateCount info to candidates 
+	 * @return mail sending status
+	 * @throws MessagingException
+	 * @throws IOException
+	 */
+	boolean sendCandidateStatus(final User user, final int candidateCount) throws MessagingException, IOException;
 }

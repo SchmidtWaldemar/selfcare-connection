@@ -13,6 +13,7 @@ public class GroupDto {
 	
 	private Long groupId;
 	
+	@Size(max = 120, message = "Nachricht darf nicht länger als 120 Zeichen sein")
 	private String msgToCreator;
 	
 	public GroupDto() {}

@@ -46,6 +46,9 @@ public class MvcConfig implements WebMvcConfigurer {
 		registry.addViewController("/group/new").setViewName("newGroup");
 		registry.addViewController("/group/createNew").setViewName("newGroup");
 		registry.addViewController("/group/register").setViewName("registerByGroup");
+		
+		registry.addViewController("/impress").setViewName("impress");
+		registry.addViewController("/privacy").setViewName("privacy");	
 	}
 	
 	@Override

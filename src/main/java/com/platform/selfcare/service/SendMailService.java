@@ -36,6 +36,12 @@ public class SendMailService implements ISendMailService {
 		String message = "Sie haben die Passwort Vergessen Funktion beantragt? Wenn ja, klicken Sie bitte auf den folgenden Link: \n" + confirmationUrl;
 		return sentMailToUser(user.getEmail(), "Passwort Vergessen?", message);
 	}
+	
+	@Override
+	public boolean sendCandidateStatus(User user, int candidateCount) throws MessagingException, IOException {
+		String message = "Neue Kandidaten warten auf Feedback. Anzahl: \n" + candidateCount;
+		return sentMailToUser(user.getEmail(), "Neue Kandidaten für Gruppe", message);
+	}
 
 	
 	private boolean sentMailToUser(final String recipientMail, final String subject, final String message) throws MessagingException {

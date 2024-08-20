@@ -1,43 +1,47 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Anmeldung</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Anmeldung</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
+
 <body>
-   <div>
+   <div class="content-area content-low-height">
       <h1>Anmeldung</h1>
+      
       <div class="content">
-         <div th:if="${param.error}" class="alert alert-danger">
-            Benutzername oder Passwort ist falsch
-         </div>
-         <div th:if="${param.message}" class="alert alert-info" th:text="${param.message}">Meldung</div>
-         <form name='f' th:action="@{/login}" method='POST'>
-         	<div class="form-group">
-         		<label class="col-form-label">E-Mail</label>
-         		<input type="email" name="email" class="form-control" required />
-         	</div>
-         	<div class="form-group mb-3">
-         		<label class="col-form-label">Passwort</label>
-         		<input type="password" name="password" class="form-control" required />
-         	</div>
-         	<div class="form-group mb-5">
-         		<input class="btn btn-primary" type="submit" value="Anmelden" />
-         	</div>
-         </form>
+		<div th:if="${param.error}" class="alert alert-danger">
+		   Benutzername oder Passwort ist falsch
+		</div>
+		<div th:if="${param.message}" class="alert alert-info" th:text="${param.message}">Meldung</div>
+		<form name='f' th:action="@{/login}" method='POST'>
+			<div class="form-group">
+				<label class="col-form-label">E-Mail</label>
+				<input type="email" name="email" class="form-control" required />
+			</div>
+			<div class="form-group mb-3">
+				<label class="col-form-label">Passwort</label>
+				<input type="password" name="password" class="form-control" required />
+			</div>
+			<div class="form-group mb-5">
+				<input class="btn btn-primary" type="submit" value="Anmelden" />
+			</div>
+		</form>
          
-         <div class="mb-3">
+		<div class="mb-3">
 		    <a href="/forgottenPassword" rel="Forgotten Password">Passwort Vergessen</a>
+		</div>
+		<div class="mb-3">
+			Noch kein Mitglied?
+		    <a href="/register/" rel="Register">Account anlegen</a>
 		</div>
       </div>
    </div>
-   <footer>
-      <a href="/" rel="Mainpage">Startseite</a>
-   </footer>
+   
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

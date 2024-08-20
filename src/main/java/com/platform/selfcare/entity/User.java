@@ -1,5 +1,6 @@
 package com.platform.selfcare.entity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,8 +26,10 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="users")
-public class User {
+public class User implements Serializable {
 	
+	private static final long serialVersionUID = 6844055507692576899L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -54,7 +57,7 @@ public class User {
     		@JoinColumn(name = "user_id"), 
     	inverseJoinColumns = 
     		@JoinColumn(name = "group_id")
-    )
+    )	
 	private Set<Group> groups = new HashSet<>();
 	
 	@Column(name = "enabled", nullable = false, columnDefinition = "boolean default false")
@@ -154,5 +157,31 @@ public class User {
 
 	public void setGroups(Set<Group> groups) {
 		this.groups = groups;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.email == null) ? 0 : this.email.hashCode());
+		return result;
+	}
+	
+	@Override
+	public boolean equals(final Object item) {
+		if (this == item) {
+			return true;
+		}
+		if (item == null) {
+			return false;
+		}
+		if (getClass() != item.getClass()) {
+			return false;
+		}
+		final User user = (User) item;
+		if (!this.email.equals(user.getEmail())) {
+			return false;
+		}
+		return true;
 	}
 }

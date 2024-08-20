@@ -1,22 +1,24 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Selbsthilfe Plattform</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Selbsthilfe Plattform</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
 <body>
-    <h1 th:if="${me}" th:text="|Hallo, ${me.user.firstName} ${me.user.lastName}!|"></h1>
-    <h1 th:unless="${me}" th:text="|Hallo, ${name}!|"></h1>
-    <div class="mb-5">
-        Herzlich Willkommen bei der Selbsthilfe Plattform. 
-    </div>
-    <footer>
-        <div th:if="${me}">
+	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
+	
+	<div class="content-area content-low-height">
+	    <h1 th:if="${me}" th:text="|Hallo, ${me.user.firstName} ${me.user.lastName}!|"></h1>
+	    <h1 th:unless="${me}" th:text="|Hallo, ${name}!|"></h1>
+	    
+	    <div class="mb-5">
+	        Herzlich Willkommen bei der Selbsthilfe Plattform. 
+	    </div>
+	    <div th:if="${me}">
             <div class="mb-3">
                 Was möchtest du tun?
             </div>
@@ -30,18 +32,20 @@
             <div th:if="${me.user.hasRole('USER')}" class="mb-5">
                 <a href="/updateOldPassword" rel="Passwortaenderung">Passwort ändern</a>
             </div>
-            
-            <form th:action="@{/logout}" method="POST">
-                <input class="link" type="submit" value="Abmelden" />
-            </form>
         </div>
 		<div th:unless="${me}" class="mb-3">
-		    <a href="/register/" rel="Registrieren">Account anlegen</a>
+		    <p>
+		    	<a href="/login" class="btn btn-primary" rel="Login">Anmelden</a>
+		    </p>
+		    <p>
+		    	Oder
+		    </p>
+		    <p>
+		    	<a href="/register/" rel="Registrieren">Account anlegen</a>
+		    </p>
 		</div>
-        <div th:unless="${me}">
-        	<p>oder</p>
-			<a href="/login" rel="Logout">Anmelden</a>
-        </div>
-    </footer>
+	</div>
+	
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

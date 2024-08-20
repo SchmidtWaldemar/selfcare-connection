@@ -1,17 +1,20 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Neue Selbsthilfegruppe erstellen</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Neue Selbsthilfegruppe erstellen</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
+
 <body>
-   <div>
+	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
+	
+	<div class="content-area content-low-height">
       <h1>Neue Selbsthilfegruppe erstellen</h1>
+      
       <div class="content">
          <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Fehler</div>
          <div th:if="${message}" class="alert alert-info" th:text="${message}">Meldung</div>
@@ -26,13 +29,16 @@
          		<textarea cols="5" rows="10" th:field="*{description}" class="form-control"></textarea>
          	</div>
          	<div class="form-group mb-5">
-         		<input class="btn btn-primary" type="submit" value="Gruppe erstellen" />
+         		<input class="btn btn-success" type="submit" value="Gruppe erstellen" />
          	</div>
          </form>
+         
+         <div class="bottom-ctl right">
+			<a href="/overview" rel="Gruppenübersicht" class="btn btn-primary">Gruppenübersicht</a>
+		</div>
       </div>
-   </div>
-   <footer>
-      <a href="/overview" rel="Overview">Übersicht</a>
-   </footer>
+	</div>
+   
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

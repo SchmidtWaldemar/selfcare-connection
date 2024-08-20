@@ -10,6 +10,9 @@ import com.platform.selfcare.entity.User;
 
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 	
-	@Query("SELECT c FROM Candidate c WHERE c.candidate = ?1")
+	@Query("SELECT c FROM Candidate c WHERE c.user = ?1")
 	List<Candidate> findCandidatures(User user);
+
+	@Query("SELECT c FROM Candidate c JOIN Group g ON c.group.id = g.id WHERE g.creator = ?1")
+	List<Candidate> findAllByGroupCreator(User creator);
 }

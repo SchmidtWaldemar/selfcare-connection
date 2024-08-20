@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.platform.selfcare.dto.GroupDto;
+import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.Group;
 import com.platform.selfcare.service.CustomUserDetails;
 import com.platform.selfcare.service.IGroupService;
@@ -23,7 +24,7 @@ import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/group")
-public class GroupController {
+public class GroupController extends ModelAttributes {
 	
 	@Autowired
 	private IGroupService groupService;
@@ -105,7 +106,38 @@ public class GroupController {
 			return "registerByGroup";
 		}
 		
-		// TODO implement
+		Optional<Group> group = this.groupService.getGroupById(groupDto.getGroupId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null 
+				&& group.isPresent() 
+				&& !group.get().isCandidate(userDetails.getUser())
+				&& !group.get().isMember(userDetails.getUser())
+				&& !group.get().isCreator(userDetails.getUser())
+				&& !group.get().isBlacklisted(userDetails.getUser())) {
+			
+			Candidate candidate = new Candidate();
+			candidate.setUser(userDetails.getUser());
+			candidate.setGroup(group.get());
+			candidate.setMessage(groupDto.getMsgToCreator());
+			
+			boolean status = this.groupService.createCandidate(candidate);
+			if (!status) {
+				model.addAttribute("globalError", "Kandidat konnte nicht erstellt werden.");
+				redirectAttr.addFlashAttribute("groupDto", groupDto);
+			}
+			else {
+				model.addAttribute("message", "Kandidatur erfolgreich!");
+				redirectAttr.addFlashAttribute("groupDto", new GroupDto());
+				model.addAttribute("groupDto", new GroupDto());
+			}
+			
+			redirectAttr.asMap().clear();
+		}
+		else {
+			model.addAttribute("globalError", "Ein unbekannter Fehler ist aufgetreten.");
+			redirectAttr.addFlashAttribute("groupDto", groupDto);
+		}
 		
 		return "registerByGroup";
 	}

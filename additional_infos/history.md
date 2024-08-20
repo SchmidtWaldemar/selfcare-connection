@@ -1,5 +1,10 @@
 # Änderungsübersicht
 
+## Update 20-08-2024
+Layoutanpassung, Rechtliches und Gruppenauthorisierungen
+
+mehr dazu: [Layoutanpassung, Rechtliches und Gruppenauthorisierungen](14_group-posting-creation.md)
+
 ## Update 16-08-2024
 Erzeugung neuer Selbsthilfegruppen
 

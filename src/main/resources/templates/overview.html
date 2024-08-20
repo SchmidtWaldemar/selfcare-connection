@@ -1,49 +1,91 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Alle Gruppen im Überblick</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Alle Gruppen im Überblick</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
+
 <body>
-   <div>
-      <h1>Alle Gruppen im Überblick</h1>
-      <div class="content mb-3">
-      	
-      	<div class="card" th:if="${groups}" th:each="group : ${groups}">
-		  <div class="card-header inline-content">
-		  	<div>
-			    erstellt <span th:text="${#dates.format(group.created, 'dd.MM.yyyy HH:mm')}"></span>
-		  	</div>
-		  	<div>
-		  		von <span th:text="${group.creator.firstName} + ' ' + ${group.creator.lastName}"></span>
-		  	</div>
-		  </div>
-		  <div class="card-body">
-		    <h5 class="card-title" th:text="${group.title}">Titel</h5>
-		    <p th:if="${group.description.length > 0}" class="card-text" th:text="${group.description}">Beschreibung</p>
-		    <p th:unless="${group.description.length > 0}" class="card-text"><i>keine Beschreibung hinzugefügt</i></p>
-		    <a th:if="${group.authorized}" th:href="'/group/' + ${group.id}" class="btn btn-success">Zur Gruppe</a>
-		    <a th:unless="${group.authorized}" th:href="'/group/register/' + ${group.id}" class="btn btn-primary">Zum Beitritt anmelden</a>
-		  </div>
-		</div>
-		<div th:unless="${groups.size() > 0}">
-			<p>
-				Noch keine Gruppen vorhanden.
-			</p>
-		</div>
-      	
-		<div class="bottom-ctl right">
-			<a href="/group/new" rel="Neue Gruppe erstellen" class="btn btn-primary">Neue Gruppe erstellen</a>
-		</div>
-      </div>
-   </div>
-   <footer>
-      <a href="/" rel="Mainpage">Startseite</a>
-   </footer>
+	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
+	
+	<div class="content-area">
+		<h1>Alle Gruppen im Überblick</h1>
+	    <div class="content mb-3">
+	    	<div th:if="${message}" class="alert alert-info" th:text="${message}">Meldung</div>
+	    	<div th:if="${candidates}">
+	    		<h2>Kandidaten warten auf Feedback</h2>
+		    	<table class="table table-striped table-bordered">
+		    		<thead class="thead-dark">
+		    			<tr>
+		    				<th>Gruppen-ID</th>
+			    			<th class="width-reduce">Vorname</th>
+			    			<th class="width-reduce">Nachname</th>
+			    			<th>Notiz</th>
+			    			<th></th>
+			    			<th></th>
+		    			</tr>
+		    		</thead>
+		    		<tbody>
+		    			<tr th:each="candidate : ${candidates}">
+		    				<td th:text="${candidate.group.id}"></td>
+		    				<td class="width-reduce" th:text="${candidate.user.firstName}"></td>
+		    				<td class="width-reduce" th:text="${candidate.user.lastName}"></td>
+		    				<td th:text="${candidate.message}"></td>
+		    				<td>
+		    					<form th:action="@{/feedbackCandidature}" th:object="${candidate}" method="POST">
+		    						<input type="hidden" th:value="${candidate.id}" name="candidate" />
+		    						<input type="hidden" th:value="accept" name="feedback" />
+		    						<input class="btn btn-success" type="button" onclick="submit()" value="&#10004;" />
+		    					</form>
+		    				</td>
+		    				<td>
+		    					<form th:action="@{/feedbackCandidature}" th:object="${candidate}" method="POST">
+		    						<input type="hidden" th:value="${candidate.id}" name="candidate" />
+		    						<input type="hidden" th:value="decline" name="feedback" />
+		    						<input class="btn btn-danger" type="button" onclick="submit()" value="&#10008;" />
+		    					</form>
+		    				</td>
+		    			</tr>
+		    		</tbody>
+		    	</table>
+	    	</div>
+	    	
+	    	<h2>Verfügbare Gruppen</h2>
+	    	<div class="card" th:if="${groups}" th:each="group : ${groups}">
+				<div class="card-header inline-content">
+				  	<div>
+					    erstellt <span th:text="${#dates.format(group.created, 'dd.MM.yyyy HH:mm')}"></span>
+				  	</div>
+				  	<div>
+				  		von <span th:text="${group.creator.firstName} + ' ' + ${group.creator.lastName}"></span>
+				  	</div>
+				</div>
+				<div class="card-body">
+				    <h3 class="card-title" th:text="${group.title}">Titel</h3>
+				    <p><b>ID:</b> <span th:text="${group.id}"></span></p>
+				    <p th:if="${group.description.length > 0}" class="card-text" th:text="${group.description}">Beschreibung</p>
+				    <p th:unless="${group.description.length > 0}" class="card-text"><i>keine Beschreibung hinzugefügt</i></p>
+				    <a th:if="${group.isMember()} or ${group.isOwner()}" th:href="'/group/' + ${group.id}" class="btn btn-success">Zur Gruppe</a>
+				    <a th:if="${group.authorized} and !${group.isMember()} and !${group.isOwner()}" th:href="'/group/' + ${group.id}" class="btn btn-info">Lesezugriff</a>
+				    <a th:if="!${group.isMember()} and !${group.isCandidate()} and !${group.isOwner()} and !${group.isBlacklisted()}" th:href="'/group/register/' + ${group.id}" class="btn btn-primary">Zum Beitritt anmelden</a>
+				    <a th:if="${group.isCandidate()}" href="#" class="btn disabled">Als Kandidat gemeldet</a>
+				</div>
+			</div>
+			<div th:unless="${groups.size() > 0}">
+				<p>
+					Noch keine Gruppen vorhanden.
+				</p>
+			</div>
+			<div class="bottom-ctl right">
+				<a href="/group/new" rel="Neue Gruppe erstellen" class="btn btn-primary">Neue Gruppe erstellen</a>
+			</div>
+	    </div>
+	</div>
+	
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="baseHead(title, links, metas, scripts)">
+
+	<title th:replace="${title}">Selbsthilfe Plattform</title>
+	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+	
+	<link rel="stylesheet" href="/css/bootstrap.min.css" type="text/css" th:href="@{/css/bootstrap.min.css}" />
+	<link rel="stylesheet" href="/css/style.css" type="text/css" th:href="@{/css/style.css}" />
+	
+	<script type="text/javascript" src="/js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
+	
+	<meta th:if="${_csrf} and ${_csrf.token}" name="_csrf" th:content="${_csrf.token}" />
+	<meta th:if="${_csrf} and ${_csrf.headerName}" name="_csrf_header" th:content="${_csrf.headerName}" />
+	
+	   <!-- placeholder for additional link and meta tags -->
+	<th:block th:replace="${metas}" />
+	<th:block th:replace="${links}" />
+	<th:block th:replace="${scripts}" />
+</head>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary" th:fragment="navbarTop()">
+	<div class="container-fluid">
+		<a class="navbar-brand" href="/">SelbstH</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+			<div class="navbar-nav">
+				<a class="nav-link" th:classappend="${requestURI == '/home'} ? 'active'" aria-current="page" href="/">Start</a>
+				<a class="nav-link" th:if="${me}" th:classappend="${requestURI == '/overview'} ? 'active'" href="/overview">Gruppen</a>
+			</div>
+		</div>
+	</div>
+</nav>
+
+<footer id="sticky-footer" class="flex-shrink-0 py-4 bg-dark text-white-50" th:fragment="footer">
+	<div class="container text-center">
+		<div style="color: white;">|&#160;&#160;&#160;&#160;</div>
+		<div><a href="/impress" th:if="${requestURI != '/impress'}" rel="Logout">Impressum</a></div>
+		<div><a href="/privacy" th:if="${requestURI != '/privacy'}" rel="Logout">Datenschutz</a></div>
+		<div th:if="${me}">
+			<form th:action="@{/logout}" method="POST">
+				<input class="link" type="submit" value="Abmelden" />
+			</form>
+		</div>
+		<div th:unless="${me} or ${requestURI == '/login'}">
+			<a href="/login" rel="Logout">Anmelden</a>
+		</div>
+	</div>
+</footer>
+</html>

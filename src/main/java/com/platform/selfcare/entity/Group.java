@@ -67,6 +67,18 @@ public class Group {
 	@Transient
 	private boolean authorized;
 	
+	@Transient
+	private boolean candidate;
+	
+	@Transient
+	private boolean member;
+	
+	@Transient
+	private boolean owner;
+	
+	@Transient
+	private boolean blacklisted;
+	
 	public Group() {}
 
 	public Long getId() {
@@ -93,19 +105,27 @@ public class Group {
 		this.description = description;
 	}
 
-	public User getCreator() {
-		return creator;
-	}
-
-	public void setCreator(User creator) {
-		this.creator = creator;
-	}
 	public Set<User> getMembers() {
 		return members;
 	}
 
 	public void setMembers(Set<User> members) {
 		this.members = members;
+	}
+	
+	public void addMember(User member) {
+		if (this.members == null) {
+			this.members = new HashSet<User>();
+		}
+		this.members.add(member);
+	}
+
+	public boolean isMember() {
+		return member;
+	}
+
+	public void setMember(boolean member) {
+		this.member = member;
 	}
 
 	public Set<Blacklist> getBlacklists() {
@@ -116,12 +136,51 @@ public class Group {
 		this.blacklists = blacklists;
 	}
 
+	public boolean isBlacklisted(User user) {
+		if (this.blacklists == null || this.blacklists.size() == 0) {
+			return false;
+		}
+		
+		return this.blacklists.stream().anyMatch(b -> b.getUser().getId().equals(user.getId()));
+	}
+	
+	public boolean isBlacklisted() {
+		return blacklisted;
+	}
+
+	public void setBlacklisted(boolean blacklisted) {
+		this.blacklisted = blacklisted;
+	}
+
 	public Set<Candidate> getCandidates() {
 		return candidates;
 	}
 
 	public void setCandidates(Set<Candidate> candidates) {
 		this.candidates = candidates;
+	}
+	
+	public void addCandidate(Candidate candidate) {
+		if (this.candidates == null) {
+			this.candidates = new HashSet<Candidate>();
+		}
+		this.candidates.add(candidate);
+	}
+	
+	public boolean isCandidate(User user) {
+		if (this.candidates == null || this.candidates.size() == 0) {
+			return false;
+		}
+		
+		return this.candidates.stream().anyMatch(c -> c.getUser().getId().equals(user.getId()));
+	}
+	
+	public boolean isCandidate() {
+		return candidate;
+	}
+
+	public void setCandidate(boolean candidate) {
+		this.candidate = candidate;
 	}
 
 	public List<Posting> getPostings() {
@@ -132,8 +191,8 @@ public class Group {
 		this.postings = postings;
 	}
 
-	public Boolean getActive() {
-		return active;
+	public Boolean isActive() {
+		return this.active == null ? false : this.active;
 	}
 
 	public void setActive(Boolean active) {
@@ -144,8 +203,10 @@ public class Group {
 		return this.members != null ? this.members.contains(user) : false;
 	}
 	
-	public boolean isAuthorized(User me) {
-		return me.hasRole(RoleType.ADMIN.getName()) || this.getCreator().equals(me) || isMember(me);
+	public boolean isAuthorized(User user) {
+		return user.hasRole(RoleType.ADMIN.getName()) 
+				|| this.getCreator().getId().equals(user.getId()) 
+				|| isMember(user);
 	}
 
 	public Date getCreated() {
@@ -181,5 +242,25 @@ public class Group {
 
 	public void setAuthorized(boolean authorized) {
 		this.authorized = authorized;
+	}
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
+	
+	public boolean isCreator(User user) {
+		return this.creator.getId().equals(user.getId());
+	}
+
+	public boolean isOwner() {
+		return owner;
+	}
+
+	public void setOwner(boolean owner) {
+		this.owner = owner;
 	}
 }

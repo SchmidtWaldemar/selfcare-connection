@@ -31,7 +31,7 @@ import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/register")
-public class RegisterController {
+public class RegisterController extends ModelAttributes {
 	
 	@Autowired
 	ApplicationEventPublisher eventPublisher;

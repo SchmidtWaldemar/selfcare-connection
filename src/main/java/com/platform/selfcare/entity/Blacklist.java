@@ -17,7 +17,7 @@ public class Blacklist {
 	private Long id;
 	
 	@ManyToOne
-	private User member;
+	private User user;
 	
 	@ManyToOne
 	private Group group;
@@ -35,12 +35,12 @@ public class Blacklist {
 		this.id = id;
 	}
 
-	public User getMember() {
-		return member;
+	public User getUser() {
+		return this.user;
 	}
 
-	public void setMember(User member) {
-		this.member = member;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public Group getGroup() {

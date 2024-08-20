@@ -16,7 +16,7 @@ import com.platform.selfcare.service.IUserService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
-public class AdminController {
+public class AdminController extends ModelAttributes {
 
 	@Autowired
 	IUserService userService;

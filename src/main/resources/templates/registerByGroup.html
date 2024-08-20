@@ -1,37 +1,46 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Bei Gruppe Anmelden</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Bei Gruppe Anmelden</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
+
 <body>
-   <div>
+	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
+	
+	<div class="content-area content-low-height">
       <h1>Bei Gruppe Anmelden</h1>
+      
       <div class="content">
          <div th:if="${param.error}" class="alert alert-danger" th:text="${param.error}">Fehler</div>
          <div th:if="${message}" class="alert alert-info" th:text="${message}">Meldung</div>
-         <p>
+         <div th:if="${globalError}" th:text="${globalError}" class="alert alert-danger"></div>
+         <p th:if="${groupDto.title}">
          	Sie möchten sich bei der Gruppe mit dem Titel '<span th:text="${groupDto.title}">Titel</span>' anmelden?
          </p>
          <form name="f" th:action="@{/group/sendMessageToCreator}" th:object="${groupDto}" method="POST">
+         	<input type="hidden" th:field="*{groupId}" />
+         	<input type="hidden" th:field="*{title}" />
          	<div class="form-group mb-3">
          		<label class="col-form-label">Nachricht an Gruppen-Verwalter</label>
          		<textarea cols="3" rows="5" th:field="*{msgToCreator}" class="form-control"></textarea>
          		<p class="alert alert-danger" th:if="${#fields.hasErrors('msgToCreator')}" th:errors="*{msgToCreator}"></p>
          	</div>
          	<div class="form-group mb-5">
-         		<input class="btn btn-primary" type="submit" value="Anfrage senden" />
+         		<input th:if="${groupDto.title}" class="btn btn-primary" type="submit" value="Anfrage senden" />
          	</div>
          </form>
+         <div th:unless="${groupDto.title}" class="mb-5">
+         	<a href="/overview" rel="Overview" class="btn btn-primary">Zur Übersicht</a>
+         </div>
+         
       </div>
    </div>
-   <footer>
-      <a href="/overview" rel="Overview">Übersicht</a>
-   </footer>
+
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

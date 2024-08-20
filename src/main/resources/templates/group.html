@@ -1,16 +1,19 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
-<head> 
-    <title>Sprechen wir heute mal über Angst</title> 
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    
-    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/css/style.css" />
-    
-    <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+
+<head th:replace="~{fragments/components :: baseHead(~{::title}, ~{::link}, ~{::meta}, ~{::script})}">
+	<title>Sprechen wir heute mal über Angst</title>
+	<meta />
+	<link />
+	<script></script>
+	<style></style>	
 </head>
+
 <body>
-   <div>
+	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
+	
+	<div class="content-area">
+	
       <h1>Sprechen wir heute mal über Angst</h1>
       <div class="content mb-3">
          <section class="post-container">
@@ -88,8 +91,7 @@
 		</div>
       </div>
    </div>
-   <footer>
-      <a href="/overview" rel="Overview">zur Übersicht</a>
-   </footer>
+   
+	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>
 </body>
 </html>

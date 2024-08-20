@@ -1,10 +1,13 @@
 package com.platform.selfcare.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -16,8 +19,9 @@ public class Candidate {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@ManyToOne
-	private User candidate;
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+	private User user;
 	
 	@ManyToOne
 	private Group group;
@@ -35,12 +39,12 @@ public class Candidate {
 		this.id = id;
 	}
 
-	public User getCandidate() {
-		return candidate;
+	public User getUser() {
+		return user;
 	}
 	
-	public void setCandidate(User candidate) {
-		this.candidate = candidate;
+	public void setUser(User candidate) {
+		this.user = candidate;
 	}
 
 	public Group getGroup() {

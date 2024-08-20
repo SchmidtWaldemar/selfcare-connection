@@ -29,7 +29,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @Controller
-public class AuthController {
+public class AuthController extends ModelAttributes {
 
 	@Autowired
 	ApplicationEventPublisher eventPublisher;
