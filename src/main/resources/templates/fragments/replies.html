@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+	<reply th:fragment="reply">
+		<blockquote  th:each="reply : ${mainreplies}">
+			<div class="post-content" th:text="${reply.text}"></div>
+			  <div class="post-info">
+			  		<div>
+						[<a th:id="${reply.id}" data-bs-toggle="modal" data-bs-target="#postingModal" class="answerPosting" href="#">antworten</a>]
+					</div>
+					<div>
+						<span th:text="${#dates.format(reply.created, 'dd.MM.yyyy HH:mm:ss')}"></span> von <span th:text="@{${reply.creator.firstName} + ' ' + ${reply.creator.lastName}}"></span>
+					</div>
+			  </div>
+			  
+			<section th:if="${reply.replies}" th:insert="~{fragments/replies :: reply}" th:with="mainreplies=${reply.replies}"></section>
+		</blockquote>
+	</reply>
+</html>

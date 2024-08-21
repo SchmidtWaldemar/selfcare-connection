@@ -6,90 +6,56 @@
 	<meta />
 	<link />
 	<script></script>
-	<style></style>	
+	<style></style>
+	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>	
+	<script th:src="@{/js/posting.js}"></script>
 </head>
 
 <body>
 	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
 	
 	<div class="content-area">
-	
-      <h1>Sprechen wir heute mal über Angst</h1>
-      <div class="content mb-3">
-         <section class="post-container">
-			<div class="post-content">
-				Ich will hier mal was sagen!
-			</div>
-			<div class="post-info">
-				<div>
-					[<a href="#">antworten</a>]
-				</div>
-				<div>
-					15.08.2024 12:45:22 von Max Musterfrau
-				</div>
-			</div>
-		</section>
-		<section class="post-container">
-		  <div class="post-content">
-				Ich höre gar nicht zu.
-		  </div>
-		  <div class="post-info">
-				<div>
-					[<a href="#">antworten</a>]
-				</div>
-				<div>
-					15.08.2024 12:49:12 von Maxi Mustermann
-				</div>
-		  </div>
-		  <section>
-				<blockquote>
-					<div class="post-content">
-							Warum nicht?
+		<h1 th:text="${group.title}">Gruppen Titel</h1>
+		<div class="content mb-3">
+			<section class="post-container" th:if="${postings}" th:each="posting : ${postings}">
+				<div class="post-content" th:text="${posting.text}"></div>
+				<div class="post-info">
+					<div>
+						[<a th:id="${posting.id}" data-bs-toggle="modal" data-bs-target="#postingModal" class="answerPosting" href="#">antworten</a>]
 					</div>
-					<section>
-						<blockquote>
-							<div class="post-content">
-									Weil ich keine Angst habe!
-							  </div>
-							  <div class="post-info">
-							  		<div>
-										[<a href="#">antworten</a>]
-									</div>
-									<div>
-										15.08.2024 13:02:34 von Maxi Mustermann
-									</div>
-							  </div>
-						</blockquote>
-					</section>
-					<div class="post-info">
-						<div>
-							[<a href="#">antworten</a>]
-						</div>
-						<div>
-							15.08.2024 12:56:52 von Max Musterfrau
-						</div>
+					<div>
+						<span th:text="${#dates.format(posting.created, 'dd.MM.yyyy HH:mm:ss')}"></span> von <span th:text="@{${posting.creator.firstName} + ' ' + ${posting.creator.lastName}}"></span>
 					</div>
-				</blockquote>
-		  </section>
-		</section>
-		<section class="post-container">
-			<div class="post-content">
-				Ist da Jemand?
-			</div>
-			<div class="post-info">
-				<div>
-					[<a href="#">antworten</a>]
 				</div>
-				<div>
-					16.08.2024 16:25:36 von Horst Gästebuch
-				</div>
+				
+				<section th:if="${posting.replies}" th:insert="~{fragments/replies :: reply}" th:with="mainreplies=${posting.replies}"></section>
+			</section>
+			<div class="bottom-ctl">
+				<button class="btn btn-primary" id="newPosting" data-bs-toggle="modal" data-bs-target="#postingModal">Neuen Beitrag</button>
 			</div>
-		</section>
-		
-		<div class="bottom-ctl">
-			<button class="btn btn-primary">Neuen Beitrag</button>
-		</div>
       </div>
+   </div>
+   
+   <div class="modal fade in" id="postingModal" tabindex="-1" role="dialog" aria-labelledby="postingModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<form name="f" th:action="@{'/group/' + ${group.id} + '/posting'}" th:object="${postingDto}" method="POST">
+					<input type="hidden" id="postingId" th:field="*{postingId}" />
+					<div class="modal-header">
+						<button type="button" data-bs-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<label class="form-label">Beitragstext</label>
+						<textarea class="form-control textarea" th:field="*{text}" rows="3" cols="5" required></textarea>
+					</div>
+					<div class="modal-footer">
+						<button type="submit" class="btn btn-primary">Posten</button>&#160;<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+					</div>
+				</form>
+			</div>
+		</div>
    </div>
    
 	<footer class="nav-top" th:replace="~{fragments/components :: footer}"></footer>

@@ -1,5 +1,6 @@
 package com.platform.selfcare.controller;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.platform.selfcare.dto.GroupDto;
+import com.platform.selfcare.dto.PostingDto;
 import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.Group;
+import com.platform.selfcare.entity.Posting;
 import com.platform.selfcare.service.CustomUserDetails;
 import com.platform.selfcare.service.IGroupService;
 
@@ -42,7 +45,12 @@ public class GroupController extends ModelAttributes {
 		
 		if (userDetails != null && group.isPresent() && group.get().isAuthorized(userDetails.getUser())) {
 			model.addAttribute("group", group.get());
+			List<Posting> postings = this.groupService.findByGroupAndNoParent(group.get());
+			
+			model.addAttribute("postings", postings);
 		}
+		
+		model.addAttribute("postingDto", new PostingDto());
 		
 		return "group";
 	}
@@ -140,5 +148,46 @@ public class GroupController extends ModelAttributes {
 		}
 		
 		return "registerByGroup";
+	}
+	
+	@PostMapping("/{groupId}/posting")
+	public String sendPosting(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("postingDto") PostingDto postingDto, @PathVariable("groupId") final Long groupId,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Group> group = this.groupService.getGroupById(groupId);
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && group.isPresent() && group.get().isAuthorized(userDetails.getUser())) {
+			
+			if (result.hasErrors()) {
+				redirectAttr.addFlashAttribute("postingDto", postingDto);
+				return groupById(model, request, groupId);
+			}
+			
+			Posting posting = new Posting(userDetails.getUser(), group.get(), postingDto.getText());
+			
+			if (postingDto.getPostingId() != null) {
+				// is answer
+				Optional<Posting> parentPosting = this.groupService.findPostingById(postingDto.getPostingId());
+				if (parentPosting.isPresent()) {
+					posting.setReplied(parentPosting.get());
+				}
+				else {
+					model.addAttribute("error", "Etwas ist schiefgelaufen bei der Antwort auf einen Beitrag");
+				}
+			}
+			else {
+				// is new posting
+			}
+			
+			this.groupService.savePosting(posting);
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return groupById(model, request, groupId);
 	}
 }

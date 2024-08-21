@@ -1,5 +1,10 @@
 # Änderungsübersicht
 
+## Update 21-08-2024
+Beiträge und Antworten veröffentlichen
+
+mehr dazu: [Beiträge und Antworten veröffentlichen](15_create_postings.md)
+
 ## Update 20-08-2024
 Layoutanpassung, Rechtliches und Gruppenauthorisierungen
 

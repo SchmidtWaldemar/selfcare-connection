@@ -1,7 +1,7 @@
 package com.platform.selfcare.entity;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -18,7 +18,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name="posting")
 public class Posting {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -35,7 +35,7 @@ public class Posting {
 	private String text;
 	
 	@OneToMany(mappedBy = "replied", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-	private Set<Posting> replies = new HashSet<>();
+	private List<Posting> replies;
 	
 	@ManyToOne
 	private Posting replied;
@@ -43,7 +43,18 @@ public class Posting {
 	@Column(name = "visible", nullable = false, columnDefinition = "boolean default true")
 	private Boolean visible;
 	
+	@Column(updatable = false, nullable = false)
+	private Date created;
+	
 	Posting() {}
+		
+	public Posting(User creator, Group group, String text) {
+		this.creator = creator;
+		this.group = group;
+		this.text = text;
+		this.created = new Date();
+		this.visible = true;
+	}
 
 	public Long getId() {
 		return id;
@@ -77,11 +88,11 @@ public class Posting {
 		this.text = text;
 	}
 
-	public Set<Posting> getReplies() {
+	public List<Posting> getReplies() {
 		return replies;
 	}
 
-	public void setReplies(Set<Posting> replies) {
+	public void setReplies(List<Posting> replies) {
 		this.replies = replies;
 	}
 
@@ -99,5 +110,13 @@ public class Posting {
 
 	public void setVisible(Boolean visible) {
 		this.visible = visible;
+	}
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 }

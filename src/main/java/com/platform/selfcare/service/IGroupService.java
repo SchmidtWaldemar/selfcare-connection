@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.Group;
+import com.platform.selfcare.entity.Posting;
 import com.platform.selfcare.entity.User;
 
 /**
@@ -25,4 +26,12 @@ public interface IGroupService {
 	boolean changeCandidateStatus(Candidate candidate, boolean feedbackStatus);
 
 	Optional<Candidate> findByCandidateId(Long candidateId);
+
+	void savePosting(Posting posting);
+
+	Optional<Posting> findPostingById(Long postingId);
+	
+	List<Posting> findByGroup(Group group);
+
+	List<Posting> findByGroupAndNoParent(Group group);
 }

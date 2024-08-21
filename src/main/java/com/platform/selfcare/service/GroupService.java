@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.platform.selfcare.entity.Blacklist;
 import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.Group;
+import com.platform.selfcare.entity.Posting;
 import com.platform.selfcare.entity.User;
 import com.platform.selfcare.repository.BlacklistRepository;
 import com.platform.selfcare.repository.CandidateRepository;
@@ -117,5 +118,25 @@ public class GroupService implements IGroupService {
 	@Override
 	public Optional<Candidate> findByCandidateId(Long candidateId) {
 		return this.candidateRepository.findById(candidateId);
+	}
+
+	@Override
+	public void savePosting(Posting posting) {
+		this.postingRepository.save(posting);
+	}
+
+	@Override
+	public Optional<Posting> findPostingById(Long postingId) {
+		return this.postingRepository.findById(postingId);
+	}
+
+	@Override
+	public List<Posting> findByGroup(Group group) {
+		return this.postingRepository.findByGroup(group);
+	}
+
+	@Override
+	public List<Posting> findByGroupAndNoParent(Group group) {
+		return this.postingRepository.findByGroupAndRepliedIsNull(group);
 	}
 }
