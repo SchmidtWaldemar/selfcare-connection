@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name="posting")
@@ -43,8 +44,17 @@ public class Posting {
 	@Column(name = "visible", nullable = false, columnDefinition = "boolean default true")
 	private Boolean visible;
 	
+	@Column(name = "active", nullable = false, columnDefinition = "boolean default true")
+	private Boolean active;
+	
 	@Column(updatable = false, nullable = false)
 	private Date created;
+	
+	@Transient
+	private boolean owner;
+	
+	@Transient
+	private Long groupId;
 	
 	Posting() {}
 		
@@ -54,6 +64,7 @@ public class Posting {
 		this.text = text;
 		this.created = new Date();
 		this.visible = true;
+		this.active = true;
 	}
 
 	public Long getId() {
@@ -111,6 +122,14 @@ public class Posting {
 	public void setVisible(Boolean visible) {
 		this.visible = visible;
 	}
+	
+	public Boolean isActive() {
+		return this.active == null ? false : this.active;
+	}
+
+	public void setActive(Boolean active) {
+		this.active = active;
+	}
 
 	public Date getCreated() {
 		return created;
@@ -118,5 +137,29 @@ public class Posting {
 
 	public void setCreated(Date created) {
 		this.created = created;
+	}
+	
+	public boolean isCreator(User user) {
+		return this.creator.getId().equals(user.getId());
+	}
+	
+	public Long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
+	}
+
+	public void setOwner(boolean owner) {
+		this.owner = owner;
+	}
+	
+	public boolean isOwner() {
+		return owner;
+	}
+
+	public boolean isMember() {
+		return this.group.isMember();
 	}
 }

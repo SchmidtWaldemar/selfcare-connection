@@ -58,6 +58,10 @@ public class OverviewController extends ModelAttributes {
 			boolean feedbackStatus = feedback.equals("accept") ? true : false;
 
 			boolean status = this.groupService.changeCandidateStatus(foundCandidate.get(), feedbackStatus);
+			if (status) {
+				this.groupService.deleteCandidate(foundCandidate.get());
+			}
+			
 			if (status && feedbackStatus) {
 				model.addAttribute("message", "Kandidat ist ab jetzt ein Mitglied.");
 			}

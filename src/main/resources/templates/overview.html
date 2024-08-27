@@ -6,7 +6,8 @@
 	<meta />
 	<link />
 	<script></script>
-	<style></style>	
+	<style></style>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/font-awesome/css/font-awesome.min.css}"></link>
 </head>
 
 <body>
@@ -39,14 +40,14 @@
 		    					<form th:action="@{/feedbackCandidature}" th:object="${candidate}" method="POST">
 		    						<input type="hidden" th:value="${candidate.id}" name="candidate" />
 		    						<input type="hidden" th:value="accept" name="feedback" />
-		    						<input class="btn btn-success" type="button" onclick="submit()" value="&#10004;" />
+		    						<input title="Mitgliedschaft akzeptieren" class="btn btn-success" type="button" onclick="submit()" value="&#10004;" />
 		    					</form>
 		    				</td>
 		    				<td>
 		    					<form th:action="@{/feedbackCandidature}" th:object="${candidate}" method="POST">
 		    						<input type="hidden" th:value="${candidate.id}" name="candidate" />
 		    						<input type="hidden" th:value="decline" name="feedback" />
-		    						<input class="btn btn-danger" type="button" onclick="submit()" value="&#10008;" />
+		    						<input title="Mitgliedschaft verweigern" class="btn btn-danger" type="button" onclick="submit()" value="&#10008;" />
 		    					</form>
 		    				</td>
 		    			</tr>
@@ -63,25 +64,71 @@
 				  	<div>
 				  		von <span th:text="${group.creator.firstName} + ' ' + ${group.creator.lastName}"></span>
 				  	</div>
+				  	<div class="card-ctl">
+				  		<form th:if="${group.isOwner()} and (not ${group.postings} or ${group.postings.size == 0})" th:name="'remove' + ${group.id}" th:action="@{/group/removeGroup}" th:object="${group}" method="POST">
+    						<input type="hidden" th:value="${group.id}" name="id" />
+    						<a title="Gruppe Entfernen" href="javascript:;" th:onclick="@{if (confirm('Soll die Gruppe wirklich entfernt werden?')) document.forms['remove{formName}'].submit()(formName=${group.id})}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+    					</form>
+    					<form th:if="${group.isOwner()} and ${group.visible} and ${group.active}" th:name="'hide' + ${group.id}" th:action="@{/group/hideGroup}" th:object="${group}" method="POST">
+    						<input type="hidden" th:value="${group.id}" name="id" />
+    						<a title="Gruppe ausblenden" href="javascript:;" th:onclick="@{if (confirm('Soll die Gruppe wirklich ausgeblendet werden?')) document.forms['hide{formName}'].submit()(formName=${group.id})}"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+    					</form>
+    					<form th:if="${group.isOwner()} and not ${group.visible} and ${group.active}" th:name="'show' + ${group.id}" th:action="@{/group/showGroup}" th:object="${group}" method="POST">
+    						<input type="hidden" th:value="${group.id}" name="id" />
+    						<a title="Gruppe einblenden" href="javascript:;" th:onclick="@{if (confirm('Soll die Gruppe wirklich wieder sichtbar gemacht werden?'))  document.forms['show{formName}'].submit()(formName=${group.id})}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+    					</form>
+    					<form th:if="${me.isAdmin()} and ${group.active}" th:name="'deactivate' + ${group.id}" th:action="@{/group/deactivateGroup}" th:object="${group}" method="POST">
+    						<input type="hidden" th:value="${group.id}" name="id" />
+    						<a title="Gruppe deaktivieren" href="javascript:;" th:onclick="@{if (confirm('Soll die Gruppe wirklich deaktiviert werden?'))  document.forms['deactivate{formName}'].submit()(formName=${group.id})}"><i class="fa fa-times" aria-hidden="true"></i></a>
+    					</form>
+    					<form th:if="${me.isAdmin()} and not ${group.active}" th:name="'activate' + ${group.id}" th:action="@{/group/reactivateGroup}" th:object="${group}" method="POST">
+    						<input type="hidden" th:value="${group.id}" name="id" />
+    						<a title="Gruppe reaktivieren" href="javascript:;" th:onclick="@{if (confirm('Soll die Gruppe wirklich aktiviert werden?'))  document.forms['activate{formName}'].submit()(formName=${group.id})}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+    					</form>
+				  	</div>
 				</div>
 				<div class="card-body">
-				    <h3 class="card-title" th:text="${group.title}">Titel</h3>
-				    <p><b>ID:</b> <span th:text="${group.id}"></span></p>
-				    <p th:if="${group.description.length > 0}" class="card-text" th:text="${group.description}">Beschreibung</p>
+				    <h3 th:if="${group.visible} and ${group.active}" class="card-title" th:text="${group.title}">Titel</h3>
+					
+					<table th:if="${group.visible} and ${group.active}" class="table">
+		    			<tr>
+		    				<td>
+		    					<p><b>Gruppen-ID:</b> <span th:text="${group.id}"></span></p>
+		    				</td>
+		    				<td>
+		    					<p><b>Anz. Mitglieder:</b> <span th:if="${group.members}" th:text="${group.members.size} + 1"></span></p>
+		    				</td>
+		    			</tr>
+		    			<tr>
+		    				<td>
+		    					<p><b>Anz. Posts:</b> <span th:if="${group.postings}" th:text="${group.postings.size}"></span></p>
+		    				</td>
+		    				<td>
+		    					<p><b>letzter Beitrag:</b> <span th:if="${group.postings} and ${group.postings.size > 0}" th:text="${#dates.format(group.postings.get(group.postings.size - 1).created, 'dd.MM.yyyy HH:mm')}"></span></p>
+		    				</td>
+		    			</tr>
+			    	</table>
+			    	<div class="group-not-active" th:unless="${group.visible} and ${group.active}">
+			    		Gruppe nicht verfügbar! Entweder ist die Gruppe vom Inhaber ausgeblendet oder vom Administrator gesperrt worden.
+			    	</div>
+					
+				    <p th:if="${group.visible} and ${group.active} and ${group.description.length > 0}" class="card-text" th:text="${group.description}">Beschreibung</p>
 				    <p th:unless="${group.description.length > 0}" class="card-text"><i>keine Beschreibung hinzugefügt</i></p>
-				    <a th:if="${group.isMember()} or ${group.isOwner()}" th:href="'/group/' + ${group.id}" class="btn btn-success">Zur Gruppe</a>
+				    <a th:if="(${group.isMember()} and ${group.visible} and ${group.active}) or ${group.isOwner()}" th:href="'/group/' + ${group.id}" class="btn btn-success">Zur Gruppe</a>
 				    <a th:if="${group.authorized} and !${group.isMember()} and !${group.isOwner()}" th:href="'/group/' + ${group.id}" class="btn btn-info">Lesezugriff</a>
-				    <a th:if="!${group.isMember()} and !${group.isCandidate()} and !${group.isOwner()} and !${group.isBlacklisted()}" th:href="'/group/register/' + ${group.id}" class="btn btn-primary">Zum Beitritt anmelden</a>
+				    <a th:if="(${group.visible} and ${group.active}) and !${group.isMember()} and !${group.isCandidate()} and !${group.isOwner()} and !${group.isBlacklisted()}" th:href="'/group/register/' + ${group.id}" class="btn btn-primary">Zum Beitritt anmelden</a>
 				    <a th:if="${group.isCandidate()}" href="#" class="btn disabled">Als Kandidat gemeldet</a>
 				</div>
 			</div>
+			
 			<div th:unless="${groups.size() > 0}">
 				<p>
 					Noch keine Gruppen vorhanden.
 				</p>
 			</div>
 			<div class="bottom-ctl right">
-				<a href="/group/new" rel="Neue Gruppe erstellen" class="btn btn-primary">Neue Gruppe erstellen</a>
+				<a href="/" rel="Start" class="btn btn-primary">Startseite</a>
+				<a href="/group/new" rel="Neue Gruppe erstellen" class="btn btn-success">Neue Gruppe erstellen</a>
 			</div>
 	    </div>
 	</div>

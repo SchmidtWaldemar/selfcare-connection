@@ -53,7 +53,7 @@ public class GroupService implements IGroupService {
 		group.setTitle(title);
 		group.setDescription(description);
 		group.setActive(true);
-		
+		group.setVisible(true);
 		return this.groupRepository.save(group);
 	}
 
@@ -108,8 +108,6 @@ public class GroupService implements IGroupService {
 				this.blacklistRepository.save(blacklist);
 			}
 			
-			this.candidateRepository.deleteById(candidate.getId());
-			
 			return true;
 		}
 		return false;
@@ -138,5 +136,60 @@ public class GroupService implements IGroupService {
 	@Override
 	public List<Posting> findByGroupAndNoParent(Group group) {
 		return this.postingRepository.findByGroupAndRepliedIsNull(group);
+	}
+
+	@Override
+	public void removeGroup(Group group) {
+		this.groupRepository.delete(group);
+	}
+
+	@Override
+	public void deactivateGroup(Group group) {
+		this.groupRepository.deactivateGroup(group);
+	}
+
+	@Override
+	public void showGroup(Group group) {
+		this.groupRepository.setGroupVisible(group);
+	}
+
+	@Override
+	public void hideGroup(Group group) {
+		this.groupRepository.hideGroup(group);
+	}
+
+	@Override
+	public void reactivateGroup(Group group) {
+		this.groupRepository.reactivateGroup(group);
+	}
+
+	@Override
+	public void removePosting(Posting posting) {
+		this.postingRepository.delete(posting);
+	}
+
+	@Override
+	public void deactivatePosting(Posting posting) {
+		this.postingRepository.deactivatePosting(posting);
+	}
+
+	@Override
+	public void reactivatePosting(Posting posting) {
+		this.postingRepository.reactivatePosting(posting);
+	}
+
+	@Override
+	public void showPosting(Posting posting) {
+		this.postingRepository.setPostingVisible(posting);
+	}
+
+	@Override
+	public void hidePosting(Posting posting) {
+		this.postingRepository.hidePosting(posting);
+	}
+
+	@Override
+	public void deleteCandidate(Candidate candidate) {
+		this.candidateRepository.deleteById(candidate.getId());
 	}
 }

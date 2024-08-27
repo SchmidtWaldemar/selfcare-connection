@@ -51,6 +51,29 @@ blockquote {
 
 .bottom-ctl {
 	margin-top: 20px;
+	display: flex;
+	justify-content: space-between;
+}
+
+.bottom-ctl input {
+	margin-right: 10px;
+}
+
+.card-ctl, .posting-ctl {
+	display: flex;
+	justify-content: space-between;
+}
+
+.card-ctl a, .posting-ctl a {
+	margin-left: 15px;
+}
+
+.card-ctl form[name^=deactivate] a, .posting-ctl form[name^=deactivate] a {
+	color: darkred;
+}
+
+.card-ctl form[name^=remove] a, .posting-ctl form[name^=remove] a {
+	color: darkgrey;
 }
 
 .inline-content {
@@ -64,6 +87,11 @@ blockquote {
 
 .card {
 	margin-bottom: 10px;
+}
+
+.card-text {
+	background-color: #fbfbfb;
+	padding: 10px;
 }
 
 .right {
@@ -103,6 +131,10 @@ footer div a::after  {
 	margin-right: 15px;
 }
 
+.content h2 {
+	margin-top: 30px;
+}
+
 @media (max-width: 550px) {	
 	.width-reduce {
 	  display: none;
@@ -127,3 +159,18 @@ footer div a::after  {
 	}
 }
 
+.py-4 {
+  height: 7.3lh;
+}
+
+.small-btn {
+	height: 25px;
+	width: 25px;
+	display: ruby-text-container;
+}
+
+.group-not-active, .posting-not-active {
+	opacity: 0.8;
+	background: repeating-linear-gradient(-45deg, #c6c6c6, #bfbfbf 1px, #fff 1px, #fff 15px);
+	font-style: italic;
+}

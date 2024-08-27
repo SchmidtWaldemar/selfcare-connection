@@ -19,6 +19,7 @@ import com.platform.selfcare.dto.PostingDto;
 import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.Group;
 import com.platform.selfcare.entity.Posting;
+import com.platform.selfcare.entity.User;
 import com.platform.selfcare.service.CustomUserDetails;
 import com.platform.selfcare.service.IGroupService;
 
@@ -44,8 +45,17 @@ public class GroupController extends ModelAttributes {
 		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
 		
 		if (userDetails != null && group.isPresent() && group.get().isAuthorized(userDetails.getUser())) {
+			// set readonly, if admin is not a member of group 
+			group.get().setReadonly(group.get().isBlacklisted(userDetails.getUser()) || group.get().isCandidate(userDetails.getUser()));
+			
 			model.addAttribute("group", group.get());
 			List<Posting> postings = this.groupService.findByGroupAndNoParent(group.get());
+			
+			for (Posting posting : postings) {
+				posting.setOwner(posting.isCreator(userDetails.getUser()));
+				// recursive call
+				setReplyOwner(postings, userDetails.getUser());
+			}
 			
 			model.addAttribute("postings", postings);
 		}
@@ -53,6 +63,21 @@ public class GroupController extends ModelAttributes {
 		model.addAttribute("postingDto", new PostingDto());
 		
 		return "group";
+	}
+	
+	/**
+	 * recursive status setter for replies of posting
+	 * 
+	 * @param replies list of replies
+	 * @param creator creator as marker
+	 */
+	private void setReplyOwner(List<Posting> replies, User creator) {
+		if (replies != null) {
+			for (Posting posting : replies) {
+				posting.setOwner(posting.isCreator(creator));
+				setReplyOwner(posting.getReplies(), creator);
+			}
+		}
 	}
 	
 	@GetMapping("/new")
@@ -66,7 +91,7 @@ public class GroupController extends ModelAttributes {
 	
 	@PostMapping("/createNew")
 	public String createNewGroup(final HttpServletRequest request, 
-			final @Valid @ModelAttribute("newGroup") GroupDto groupDto, 
+			final @Valid @ModelAttribute("newGroup") GroupDto groupDto,
 			BindingResult result, 
 			RedirectAttributes redirectAttr, 
 			Model model) {
@@ -75,11 +100,11 @@ public class GroupController extends ModelAttributes {
 			redirectAttr.addFlashAttribute("newGroup", groupDto);
 			return "newGroup";
 		}
-		
+
 		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
-		
 		if (userDetails != null) {
 			Group group = this.groupService.createNewGroup(userDetails.getUser(), groupDto.getTitle(), groupDto.getDescription());
+
 			if (group != null) {
 				redirectAttr.asMap().clear();
 				model.addAttribute("message", "Gruppe erfolgreich angelegt!");
@@ -189,5 +214,277 @@ public class GroupController extends ModelAttributes {
 		redirectAttr.asMap().clear();
 		
 		return groupById(model, request, groupId);
+	}
+	
+	@PostMapping("/removeGroup")
+	public String removeGroup(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("group") Group groupTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Group> group = this.groupService.getGroupById(groupTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && group.isPresent() && group.get().isCreator(userDetails.getUser())) {
+			
+			if (result.hasErrors() 
+					|| (group.get().getPostings() != null && group.get().getPostings().size() > 0)) {
+				model.addAttribute("error", "Gruppe konnte nicht gelöscht werden");
+				redirectAttr.addFlashAttribute("group", groupTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, groupTo.getId());
+			}
+			
+			this.groupService.removeGroup(group.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/overview";
+	}
+	
+	@PostMapping("/hideGroup")
+	public String hideGroup(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("group") Group groupTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Group> group = this.groupService.getGroupById(groupTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && group.isPresent() && group.get().isCreator(userDetails.getUser())) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Gruppe konnte nicht ausgeblendet werden");
+				redirectAttr.addFlashAttribute("group", groupTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, groupTo.getId());
+			}
+			
+			this.groupService.hideGroup(group.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/overview";
+	}
+	
+	@PostMapping("/showGroup")
+	public String showGroup(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("group") Group groupTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Group> group = this.groupService.getGroupById(groupTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && group.isPresent() && group.get().isCreator(userDetails.getUser())) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Gruppe konnte nicht eingeblendet werden");
+				redirectAttr.addFlashAttribute("group", groupTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, groupTo.getId());
+			}
+			
+			this.groupService.showGroup(group.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/overview";
+	}
+	
+	@PostMapping("/deactivateGroup")
+	public String deactivateGroup(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("group") Group groupTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Group> group = this.groupService.getGroupById(groupTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && userDetails.isAdmin() && group.isPresent()) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Gruppe konnte nicht deaktiviert werden");
+				redirectAttr.addFlashAttribute("group", groupTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, groupTo.getId());
+			}
+			
+			this.groupService.deactivateGroup(group.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/overview";
+	}
+	
+	@PostMapping("/reactivateGroup")
+	public String reactivateGroup(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("group") Group groupTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Group> group = this.groupService.getGroupById(groupTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && userDetails.isAdmin() && group.isPresent()) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Gruppe konnte nicht aktiviert werden");
+				redirectAttr.addFlashAttribute("group", groupTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, groupTo.getId());
+			}
+			
+			this.groupService.reactivateGroup(group.get());
+		}
+
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/overview";
+	}
+	
+	@PostMapping("/removePosting")
+	public String removePosting(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("posting") Posting postingTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Posting> posting = this.groupService.findPostingById(postingTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && posting.isPresent() && posting.get().isCreator(userDetails.getUser())) {
+			
+			if (result.hasErrors() 
+					|| (posting.get().getReplies() != null && posting.get().getReplies().size() > 0)) {
+				model.addAttribute("error", "Beitrag konnte nicht gelöscht werden");
+				redirectAttr.addFlashAttribute("posting", postingTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, postingTo.getGroupId());
+			}
+			
+			this.groupService.removePosting(posting.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/group/" + postingTo.getGroupId();
+	}
+	
+	@PostMapping("/hidePosting")
+	public String hidePosting(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("posting") Posting postingTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Posting> posting = this.groupService.findPostingById(postingTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && posting.isPresent() && posting.get().isCreator(userDetails.getUser())) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Beitrag konnte nicht ausgeblendet werden");
+				redirectAttr.addFlashAttribute("posting", postingTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, postingTo.getGroupId());
+			}
+			
+			this.groupService.hidePosting(posting.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/group/" + postingTo.getGroupId();
+	}
+	
+	@PostMapping("/showPosting")
+	public String showPosting(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("posting") Posting postingTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Posting> posting = this.groupService.findPostingById(postingTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && posting.isPresent() && posting.get().isCreator(userDetails.getUser())) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Beitrag konnte nicht eingeblendet werden");
+				redirectAttr.addFlashAttribute("posting", postingTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, postingTo.getGroupId());
+			}
+			
+			this.groupService.showPosting(posting.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/group/" + postingTo.getGroupId();
+	}
+	
+	@PostMapping("/deactivatePosting")
+	public String deactivatePosting(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("posting") Posting postingTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Posting> posting = this.groupService.findPostingById(postingTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && userDetails.isAdmin() && posting.isPresent()) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Beitrag konnte nicht deaktiviert werden");
+				redirectAttr.addFlashAttribute("posting", postingTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, postingTo.getGroupId());
+			}
+			
+			this.groupService.deactivatePosting(posting.get());
+		}
+		
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/group/" + postingTo.getGroupId();
+	}
+	
+	@PostMapping("/reactivatePosting")
+	public String reactivatePosting(final HttpServletRequest request, 
+			final @Valid @ModelAttribute("posting") Posting postingTo,
+			BindingResult result, 
+			RedirectAttributes redirectAttr, 
+			Model model) {
+		
+		Optional<Posting> posting = this.groupService.findPostingById(postingTo.getId());
+		CustomUserDetails userDetails = (CustomUserDetails) request.getSession().getAttribute("user");
+		
+		if (userDetails != null && userDetails.isAdmin() && posting.isPresent()) {
+			
+			if (result.hasErrors()) {
+				model.addAttribute("error", "Beitrag konnte nicht aktiviert werden");
+				redirectAttr.addFlashAttribute("posting", postingTo);
+				redirectAttr.asMap().clear();
+				return groupById(model, request, postingTo.getGroupId());
+			}
+			
+			this.groupService.reactivatePosting(posting.get());
+		}
+
+		redirectAttr.asMap().clear();
+		
+		return "redirect:/group/" + postingTo.getGroupId();
 	}
 }

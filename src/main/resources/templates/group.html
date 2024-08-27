@@ -9,34 +9,69 @@
 	<style></style>
 	<script th:src="@{/js/jquery-3.7.1.min.js}"></script>	
 	<script th:src="@{/js/posting.js}"></script>
+	<link rel="stylesheet" type="text/css" th:href="@{/css/font-awesome/css/font-awesome.min.css}"></link>
 </head>
 
 <body>
 	<nav class="nav-top" th:replace="~{fragments/components :: navbarTop()}"></nav>
 	
 	<div class="content-area">
-		<h1 th:text="${group.title}">Gruppen Titel</h1>
-		<div class="content mb-3">
+		<h1 th:if="${group}" th:text="${group.title}">Gruppen Titel</h1>
+		<div th:if="${error}" th:text="${error}" class="alert alert-danger"></div>
+		<div th:if="${group}" class="content mb-3">
 			<section class="post-container" th:if="${postings}" th:each="posting : ${postings}">
-				<div class="post-content" th:text="${posting.text}"></div>
+				<div th:if="${posting.visible} and ${posting.active}" class="post-content" th:text="${posting.text}"></div>
+				<div class="post-content posting-not-active" th:unless="${posting.visible} and ${posting.active}">Dieser Beitrag ist entweder vom Inhaber ausgeblendet oder vom Administrator gesperrt worden.</div>
+				
 				<div class="post-info">
-					<div>
+					<div th:if="not ${posting.isOwner()} and not ${group.isReadonly()}">
 						[<a th:id="${posting.id}" data-bs-toggle="modal" data-bs-target="#postingModal" class="answerPosting" href="#">antworten</a>]
 					</div>
 					<div>
 						<span th:text="${#dates.format(posting.created, 'dd.MM.yyyy HH:mm:ss')}"></span> von <span th:text="@{${posting.creator.firstName} + ' ' + ${posting.creator.lastName}}"></span>
+					</div>
+					<div class="posting-ctl">
+				 		<form th:if="${posting.isOwner()} and (not ${posting.replies} or ${posting.replies.size == 0})" th:name="'remove' + ${posting.id}" th:action="@{/group/removePosting}" th:object="${posting}" method="POST">
+							<input type="hidden" th:value="${posting.id}" name="id" />
+							<input type="hidden" th:value="${posting.group.id}" name="groupId" />
+							<a title="Beitrag Entfernen" href="javascript:;" th:onclick="@{if (confirm('Soll der Beitrag wirklich entfernt werden?')) document.forms['remove{formName}'].submit()(formName=${posting.id})}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+						</form>
+						<form th:if="${posting.isOwner()} and ${posting.visible} and ${posting.active}" th:name="'hide' + ${posting.id}" th:action="@{/group/hidePosting}" th:object="${posting}" method="POST">
+							<input type="hidden" th:value="${posting.id}" name="id" />
+							<input type="hidden" th:value="${posting.group.id}" name="groupId" />
+							<a title="Beitrag ausblenden" href="javascript:;" th:onclick="@{if (confirm('Soll der Beitrag wirklich ausgeblendet werden?')) document.forms['hide{formName}'].submit()(formName=${posting.id})}"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+						</form>
+						<form th:if="${posting.isOwner()} and not ${posting.visible} and ${posting.active}" th:name="'show' + ${posting.id}" th:action="@{/group/showPosting}" th:object="${posting}" method="POST">
+							<input type="hidden" th:value="${posting.id}" name="id" />
+							<input type="hidden" th:value="${posting.group.id}" name="groupId" />
+							<a title="Beitrag einblenden" href="javascript:;" th:onclick="@{if (confirm('Soll der Beitrag wirklich wieder sichtbar gemacht werden?'))  document.forms['show{formName}'].submit()(formName=${posting.id})}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+						</form>
+						<form th:if="${me.isAdmin()} and ${posting.active}" th:name="'deactivate' + ${posting.id}" th:action="@{/group/deactivatePosting}" th:object="${posting}" method="POST">
+							<input type="hidden" th:value="${posting.id}" name="id" />
+							<input type="hidden" th:value="${posting.group.id}" name="groupId" />
+							<a title="Beitrag deaktivieren" href="javascript:;" th:onclick="@{if (confirm('Soll der Beitrag wirklich deaktiviert werden?'))  document.forms['deactivate{formName}'].submit()(formName=${posting.id})}"><i class="fa fa-times" aria-hidden="true"></i></a>
+						</form>
+						<form th:if="${me.isAdmin()} and not ${posting.active}" th:name="'activate' + ${posting.id}" th:action="@{/group/reactivatePosting}" th:object="${posting}" method="POST">
+							<input type="hidden" th:value="${posting.id}" name="id" />
+							<input type="hidden" th:value="${posting.group.id}" name="groupId" />
+							<a title="Beitrag reaktivieren" href="javascript:;" th:onclick="@{if (confirm('Soll der Beitrag wirklich aktiviert werden?'))  document.forms['activate{formName}'].submit()(formName=${posting.id})}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+						</form>
 					</div>
 				</div>
 				
 				<section th:if="${posting.replies}" th:insert="~{fragments/replies :: reply}" th:with="mainreplies=${posting.replies}"></section>
 			</section>
 			<div class="bottom-ctl">
-				<button class="btn btn-primary" id="newPosting" data-bs-toggle="modal" data-bs-target="#postingModal">Neuen Beitrag</button>
+				<a class="btn btn-primary" rel="Uebersicht" href="/overview">Gruppenübersicht</a>
+				<button class="btn btn-success" id="newPosting" data-bs-toggle="modal" data-bs-target="#postingModal">Neuen Beitrag</button>
 			</div>
+      </div>
+      <div th:unless="${group}">
+      	Keine Gruppe ausgewählt
       </div>
    </div>
    
-   <div class="modal fade in" id="postingModal" tabindex="-1" role="dialog" aria-labelledby="postingModalLabel" aria-hidden="true">
+   <div th:if="${group}" class="modal fade in" id="postingModal" tabindex="-1" role="dialog" aria-labelledby="postingModalLabel" aria-hidden="true">
 		<div class="modal-dialog" role="document">
 			<div class="modal-content">
 				<form name="f" th:action="@{'/group/' + ${group.id} + '/posting'}" th:object="${postingDto}" method="POST">

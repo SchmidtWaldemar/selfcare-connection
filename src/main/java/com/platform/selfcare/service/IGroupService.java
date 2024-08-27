@@ -34,4 +34,26 @@ public interface IGroupService {
 	List<Posting> findByGroup(Group group);
 
 	List<Posting> findByGroupAndNoParent(Group group);
+	
+	void deleteCandidate(Candidate candidate);
+
+	void removeGroup(Group group);
+
+	void deactivateGroup(Group group);
+
+	void reactivateGroup(Group group);
+
+	void showGroup(Group group);
+
+	void hideGroup(Group group);
+	
+	void removePosting(Posting posting);
+
+	void deactivatePosting(Posting posting);
+
+	void reactivatePosting(Posting posting);
+
+	void showPosting(Posting posting);
+
+	void hidePosting(Posting posting);
 }

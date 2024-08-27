@@ -1,5 +1,10 @@
 # Änderungsübersicht
 
+## Update 27-08-2024
+Erste Version zum Testeinsatz
+
+mehr dazu: [Beta Status](16_beta-status.md)
+
 ## Update 21-08-2024
 Beiträge und Antworten veröffentlichen
 

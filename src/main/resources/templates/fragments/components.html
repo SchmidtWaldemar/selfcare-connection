@@ -39,6 +39,7 @@
 <footer id="sticky-footer" class="flex-shrink-0 py-4 bg-dark text-white-50" th:fragment="footer">
 	<div class="container text-center">
 		<div style="color: white;">|&#160;&#160;&#160;&#160;</div>
+		<div><a href="/" th:if="${requestURI == '/login'}" rel="Startseite">Startseite</a></div>
 		<div><a href="/impress" th:if="${requestURI != '/impress'}" rel="Logout">Impressum</a></div>
 		<div><a href="/privacy" th:if="${requestURI != '/privacy'}" rel="Logout">Datenschutz</a></div>
 		<div th:if="${me}">

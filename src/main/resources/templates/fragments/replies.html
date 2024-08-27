@@ -2,15 +2,43 @@
 <html xmlns:th="http://www.thymeleaf.org">
 	<reply th:fragment="reply">
 		<blockquote  th:each="reply : ${mainreplies}">
-			<div class="post-content" th:text="${reply.text}"></div>
-			  <div class="post-info">
-			  		<div>
-						[<a th:id="${reply.id}" data-bs-toggle="modal" data-bs-target="#postingModal" class="answerPosting" href="#">antworten</a>]
-					</div>
-					<div>
-						<span th:text="${#dates.format(reply.created, 'dd.MM.yyyy HH:mm:ss')}"></span> von <span th:text="@{${reply.creator.firstName} + ' ' + ${reply.creator.lastName}}"></span>
-					</div>
-			  </div>
+			<div th:if="${reply.visible} and ${reply.active}" class="post-content" th:text="${reply.text}"></div>
+			<div class="post-content posting-not-active" th:unless="${reply.visible} and ${reply.active}">Dieser Beitrag ist entweder vom Inhaber ausgeblendet oder vom Administrator gesperrt worden.</div>
+			<div class="post-info">
+				<div th:if="not ${reply.isOwner()} and not ${group.isReadonly()}">
+					[<a th:id="${reply.id}" data-bs-toggle="modal" data-bs-target="#postingModal" class="answerPosting" href="#">antworten</a>]
+				</div>
+				<div>
+					<span th:text="${#dates.format(reply.created, 'dd.MM.yyyy HH:mm:ss')}"></span> von <span th:text="@{${reply.creator.firstName} + ' ' + ${reply.creator.lastName}}"></span>
+				</div>
+				<div class="posting-ctl">
+			 		<form th:if="${reply.isOwner()} and (not ${reply.replies} or ${reply.replies.size == 0})" th:name="'remove' + ${reply.id}" th:action="@{/group/removePosting}" th:object="${posting}" method="POST">
+						<input type="hidden" th:value="${reply.id}" name="id" />
+						<input type="hidden" th:value="${reply.group.id}" name="groupId" />
+						<a title="Antwort Entfernen" href="javascript:;" th:onclick="@{if (confirm('Soll die Antwort wirklich entfernt werden?')) document.forms['remove{formName}'].submit()(formName=${reply.id})}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+					</form>
+					<form th:if="${reply.isOwner()} and ${reply.visible} and ${reply.active}" th:name="'hide' + ${reply.id}" th:action="@{/group/hidePosting}" th:object="${posting}" method="POST">
+						<input type="hidden" th:value="${reply.id}" name="id" />
+						<input type="hidden" th:value="${reply.group.id}" name="groupId" />
+						<a title="Antwort ausblenden" href="javascript:;" th:onclick="@{if (confirm('Soll die Antwort wirklich ausgeblendet werden?')) document.forms['hide{formName}'].submit()(formName=${reply.id})}"><i class="fa fa-eye-slash" aria-hidden="true"></i></a>
+					</form>
+					<form th:if="${reply.isOwner()} and not ${reply.visible} and ${reply.active}" th:name="'show' + ${reply.id}" th:action="@{/group/showPosting}" th:object="${posting}" method="POST">
+						<input type="hidden" th:value="${reply.id}" name="id" />
+						<input type="hidden" th:value="${reply.group.id}" name="groupId" />
+						<a title="Antwort einblenden" href="javascript:;" th:onclick="@{if (confirm('Soll die Antwort wirklich wieder sichtbar gemacht werden?'))  document.forms['show{formName}'].submit()(formName=${reply.id})}"><i class="fa fa-eye" aria-hidden="true"></i></a>
+					</form>
+					<form th:if="${me.isAdmin()} and ${reply.active}" th:name="'deactivate' + ${reply.id}" th:action="@{/group/deactivatePosting}" th:object="${posting}" method="POST">
+						<input type="hidden" th:value="${reply.id}" name="id" />
+						<input type="hidden" th:value="${reply.group.id}" name="groupId" />
+						<a title="Antwort deaktivieren" href="javascript:;" th:onclick="@{if (confirm('Soll die Antwort wirklich deaktiviert werden?'))  document.forms['deactivate{formName}'].submit()(formName=${reply.id})}"><i class="fa fa-times" aria-hidden="true"></i></a>
+					</form>
+					<form th:if="${me.isAdmin()} and not ${reply.active}" th:name="'activate' + ${reply.id}" th:action="@{/group/reactivatePosting}" th:object="${posting}" method="POST">
+						<input type="hidden" th:value="${reply.id}" name="id" />
+						<input type="hidden" th:value="${reply.group.id}" name="groupId" />
+						<a title="Antwort reaktivieren" href="javascript:;" th:onclick="@{if (confirm('Soll die Antwort wirklich aktiviert werden?'))  document.forms['activate{formName}'].submit()(formName=${reply.id})}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+					</form>
+				</div>
+			</div>
 			  
 			<section th:if="${reply.replies}" th:insert="~{fragments/replies :: reply}" th:with="mainreplies=${reply.replies}"></section>
 		</blockquote>

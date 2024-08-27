@@ -58,6 +58,9 @@ public class Group {
 	@Column(name = "active", nullable = false, columnDefinition = "boolean default true")
 	private Boolean active;
 	
+	@Column(name = "visible", nullable = false, columnDefinition = "boolean default true")
+	private Boolean visible;
+	
 	@Column(updatable = false, nullable = false)
 	private Date created;
 	
@@ -78,6 +81,9 @@ public class Group {
 	
 	@Transient
 	private boolean blacklisted;
+	
+	@Transient
+	private boolean readonly;
 	
 	public Group() {}
 
@@ -152,6 +158,14 @@ public class Group {
 		this.blacklisted = blacklisted;
 	}
 
+	public boolean isReadonly() {
+		return readonly;
+	}
+
+	public void setReadonly(boolean readonly) {
+		this.readonly = readonly;
+	}
+
 	public Set<Candidate> getCandidates() {
 		return candidates;
 	}
@@ -197,6 +211,14 @@ public class Group {
 
 	public void setActive(Boolean active) {
 		this.active = active;
+	}
+
+	public Boolean isVisible() {
+		return this.visible == null ? false : this.visible;
+	}
+
+	public void setVisible(Boolean visible) {
+		this.visible = visible;
 	}
 
 	public boolean isMember(User user) {

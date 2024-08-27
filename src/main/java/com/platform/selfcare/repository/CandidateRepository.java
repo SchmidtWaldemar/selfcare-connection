@@ -8,7 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import com.platform.selfcare.entity.Candidate;
 import com.platform.selfcare.entity.User;
 
+import jakarta.transaction.Transactional;
+
+@Transactional
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
+	
+	void deleteById(Long id);
 	
 	@Query("SELECT c FROM Candidate c WHERE c.user = ?1")
 	List<Candidate> findCandidatures(User user);
